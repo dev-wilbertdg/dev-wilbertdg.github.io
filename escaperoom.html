@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escape room</title>
+<style>
+  :root{ --bg:#04050F; --bg2:#0E1030; --ink:#FFF6E0; --brass:#E8B04B; --bad:#E5484D; --good:#3DDC97; color-scheme:dark; }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%;overflow:hidden}
+  body{
+    background:radial-gradient(ellipse at 50% 35%,var(--bg2),var(--bg) 72%);
+    color:var(--ink);
+    font-family:"Avenir Next","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .8s;
+  }
+  body.won{background:radial-gradient(ellipse at 50% 35%,#0C4A36,#030C08 75%)}
+  main{display:flex;flex-direction:column;align-items:center;gap:4vh;width:100%;padding:0 4vw;position:relative;z-index:2}
+
+  /* Kluis (3D) */
+  #vault{--S:clamp(200px,40vh,400px);width:var(--S);height:var(--S);position:relative;perspective:1400px;margin-bottom:1vh}
+  .frame{position:absolute;inset:0;border-radius:7%;background:linear-gradient(145deg,#2D3248,#0F111D);border:3px solid #3A3F58;box-shadow:0 24px 60px rgba(0,0,0,.85),inset 0 0 0 6px rgba(0,0,0,.25)}
+  .hinge{position:absolute;left:5.5%;width:5%;height:9%;border-radius:20%;background:linear-gradient(90deg,#6F5420,#C9953A,#6F5420);box-shadow:0 3px 6px #000}
+  .opening{position:absolute;inset:10%;border-radius:50%;background:#05060C;box-shadow:inset 0 0 40px 10px #000;overflow:hidden}
+  .glow{position:absolute;inset:0;background:radial-gradient(circle,#FFE9A8,#E8B04B 55%,#6A4A10);opacity:0;transition:opacity .9s .5s}
+  .won .glow{opacity:1}
+  .door{position:absolute;inset:10%;transform-style:preserve-3d;transform-origin:0 50%;transition:transform 1.5s cubic-bezier(.55,0,.25,1)}
+  .won .door{transform:rotateY(-105deg)}
+  .disc{position:absolute;inset:0;border-radius:50%}
+  .front{position:absolute;inset:0;border-radius:50%;transform:translateZ(1px);backface-visibility:hidden;transform-style:preserve-3d;
+    background:radial-gradient(circle at 35% 30%,#7A8099,#2E3248 70%);border:3px solid #9AA0BA}
+  .front::before{content:"";position:absolute;inset:9%;border-radius:50%;border:3px solid #151828;box-shadow:0 0 0 2px #4A4F68}
+  .bolt{position:absolute;width:6%;aspect-ratio:1;margin:-3% 0 0 -3%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E8C070,#6F5420);box-shadow:0 2px 3px #000}
+  #wheel{position:absolute;left:22%;top:22%;width:56%;height:56%;transform-style:preserve-3d;transform:translateZ(12px);
+    transition:transform .5s cubic-bezier(.3,1.4,.5,1);filter:drop-shadow(0 .6em .5em rgba(0,0,0,.7))}
+  #wheel i{position:absolute;display:block;background:linear-gradient(#F4CF7E,#B98322)}
+  #wheel .ring{inset:12%;border-radius:50%;background:none;border:7px solid #D9A444;box-shadow:inset 0 0 0 2px #7A5514}
+  #wheel .h{left:0;right:0;top:44%;height:12%;border-radius:99px}
+  #wheel .v{top:0;bottom:0;left:44%;width:12%;border-radius:99px}
+  #wheel .hub{left:36%;top:36%;width:28%;height:28%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE9A8,#B98322);box-shadow:0 0 0 4px #7A5514}
+  #wheel .k{width:15%;height:15%;border-radius:50%}
+  .led{position:absolute;left:47.5%;top:3.5%;width:5%;aspect-ratio:1;border-radius:50%;background:var(--bad);animation:led 2s ease-in-out infinite;box-shadow:0 0 8px currentColor;color:var(--bad)}
+  .won .led{background:var(--good);color:var(--good);animation:none}
+  @keyframes led{50%{opacity:.25}}
+
+  /* Blokjes */
+  #slots{display:flex;gap:clamp(10px,2vw,28px)}
+  .slot{
+    width:clamp(48px,min(11vw,15vh),130px);aspect-ratio:1;
+    border:4px solid #5A4720;border-radius:22%;background:rgba(0,0,0,.45);
+    display:flex;align-items:center;justify-content:center;cursor:text;
+    transition:border-color .2s,box-shadow .2s;
+  }
+  .slot.active{border-color:var(--brass);box-shadow:0 0 0 6px rgba(232,176,75,.2)}
+  .slot.filled{border-color:var(--brass)}
+  .slot.filled::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;background:var(--ink);animation:pop .18s ease-out}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  .bad #slots{animation:shake .45s}
+  .bad .slot{border-color:var(--bad)}
+  .bad .slot.filled::after{background:var(--bad)}
+  @keyframes shake{20%{transform:translateX(-22px)}40%{transform:translateX(20px)}60%{transform:translateX(-14px)}80%{transform:translateX(10px)}}
+
+  #real{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+  button{
+    font:inherit;font-weight:700;font-size:clamp(20px,3.4vh,32px);letter-spacing:.02em;
+    background:var(--brass);color:#12143A;border:0;border-radius:999px;
+    padding:.6em 2.4em;cursor:pointer;transition:transform .12s,filter .12s;
+  }
+  button:hover{filter:brightness(1.08)}
+  button:active{transform:scale(.96)}
+  button:focus-visible{outline:4px solid var(--ink);outline-offset:4px}
+
+  #stage{display:grid;place-items:center}
+  #stage>*{grid-area:1/1}
+  #msg{visibility:hidden;font-size:clamp(40px,9vh,100px);line-height:1;font-weight:800}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}}
+  .won #msg{visibility:visible;animation:rise .6s ease-out}
+  .won #slots,.won #go{visibility:hidden}
+  canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+</style>
+</head>
+<body>
+<main>
+  <div id="vault" aria-hidden="true">
+    <div class="frame"></div>
+    <div class="hinge" style="top:26%"></div><div class="hinge" style="top:65%"></div>
+    <div class="opening"><div class="glow"></div></div>
+    <div class="door" id="door">
+      <div class="front">
+        <div class="led"></div>
+        <div id="wheel">
+          <i class="ring"></i><i class="h"></i><i class="v"></i>
+          <i class="k" style="left:-2%;top:42.5%"></i><i class="k" style="right:-2%;top:42.5%"></i>
+          <i class="k" style="top:-2%;left:42.5%"></i><i class="k" style="bottom:-2%;left:42.5%"></i>
+          <i class="hub"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="stage"><div id="slots" aria-label="Code"></div><div id="msg">Goed!</div></div>
+  <button id="go" type="button">Check</button>
+</main>
+<input id="real" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Code invoeren">
+<canvas id="c"></canvas>
+
+<script>
+const CODE = "119824";   // 119 8 2 4
+const LEN = 6;
+const real = document.getElementById("real");
+const slotsEl = document.getElementById("slots");
+const wheel = document.getElementById("wheel");
+const body = document.body;
+let value = "", locked = false, angle = 0, resetTimer = null;
+
+// deur: dikte opbouwen met gestapelde schijven
+const door = document.getElementById("door"), front = door.querySelector(".front");
+const T = 18;
+for (let i = 0; i <= T; i++){
+  const d = document.createElement("div"); d.className = "disc";
+  d.style.transform = `translateZ(${-i*2}px)`;
+  d.style.background = i === T
+    ? "radial-gradient(circle at 60% 40%,#6B7190,#2A2E44 75%)"
+    : `hsl(228 12% ${20 + (i % 2) * 8}%)`;
+  if (i === T) d.style.boxShadow = "inset 0 0 0 8px #3A3F58, inset 0 0 0 11px #151828";
+  door.insertBefore(d, front);
+}
+// bouten rond de deur
+for (let i = 0; i < 12; i++){
+  const a = i * Math.PI / 6, b = document.createElement("div");
+  b.className = "bolt";
+  b.style.left = (50 + 43*Math.cos(a)) + "%"; b.style.top = (50 + 43*Math.sin(a)) + "%";
+  front.appendChild(b);
+}
+// blokjes
+for (let i = 0; i < LEN; i++){
+  const s = document.createElement("div"); s.className = "slot"; slotsEl.appendChild(s);
+}
+const slots = [...slotsEl.children];
+
+function render(){
+  slots.forEach((s, i) => {
+    s.classList.toggle("filled", i < value.length);
+    s.classList.toggle("active", !locked && i === Math.min(value.length, LEN - 1));
+  });
+}
+function spin(deg){ angle += deg; wheel.style.transform = `translateZ(12px) rotate(${angle}deg)`; }
+function focusInput(){ real.focus({preventScroll:true}); }
+function goFull(){
+  const el = document.documentElement;
+  if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+}
+
+real.addEventListener("input", () => {
+  if (locked) { real.value = ""; return; }
+  const old = value.length;
+  value = real.value.replace(/\D/g, "").slice(0, LEN);
+  real.value = value;
+  body.classList.remove("bad");
+  if (value.length > old) spin(60);
+  render();
+});
+real.addEventListener("keydown", e => { if (e.key === "Enter") check(); });
+document.addEventListener("pointerdown", () => { goFull(); setTimeout(focusInput, 0); });
+document.addEventListener("keydown", () => { goFull(); focusInput(); }, {once:true});
+document.getElementById("go").addEventListener("click", check);
+
+function check(){
+  if (locked || !value) return;
+  if (value === CODE) win();
+  else {
+    body.classList.remove("bad"); void body.offsetWidth; body.classList.add("bad");
+    spin(-180);
+    setTimeout(() => { value = ""; real.value = ""; body.classList.remove("bad"); render(); }, 900);
+  }
+}
+function win(){
+  locked = true; render(); spin(540);
+  setTimeout(() => { body.classList.add("won"); burst(); }, 600);
+  resetTimer = setTimeout(reset, 5600);   // 5 sec. na het openen terug
+}
+function reset(){
+  clearTimeout(resetTimer);
+  locked = false; value = ""; real.value = "";
+  body.classList.remove("won","bad");
+  spin(-angle % 360 - 360);
+  parts.length = 0; stopSpawn = 0;
+  render(); focusInput();
+}
+
+/* Confetti */
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const colors = ["#E8B04B","#FFF6E0","#3DDC97","#FF6B9D","#5CC8FF","#FFD93D","#B388FF"];
+let parts = [], raf = null, stopSpawn = 0;
+function size(){ cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+addEventListener("resize", size); size();
+
+function spawn(x, y, vx, vy){
+  parts.push({x, y, vx, vy, w: 8 + Math.random()*10, h: 14 + Math.random()*12,
+    r: Math.random()*6.28, vr: (Math.random()-.5)*.4, c: colors[Math.random()*colors.length|0],
+    t: Math.random()*6.28, circle: Math.random() < .25});
+}
+function burst(){
+  const W = innerWidth, H = innerHeight;
+  for (let i = 0; i < 160; i++){
+    spawn(0, H*.8, 8 + Math.random()*14, -(12 + Math.random()*16));
+    spawn(W, H*.8, -(8 + Math.random()*14), -(12 + Math.random()*16));
+  }
+  stopSpawn = performance.now() + 4000;
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(now){
+  const W = innerWidth, H = innerHeight, dpr = devicePixelRatio;
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (now < stopSpawn && parts.length < 450){
+    for (let i = 0; i < 3; i++) spawn(Math.random()*W, -20, (Math.random()-.5)*3, 2 + Math.random()*3);
+  }
+  parts = parts.filter(p => p.y < H + 40);
+  for (const p of parts){
+    p.vy += .32; p.vx *= .992; p.vy = Math.min(p.vy, 9);
+    p.x += p.vx; p.y += p.vy; p.r += p.vr; p.t += .12;
+    ctx.save();
+    ctx.translate(p.x*dpr, p.y*dpr); ctx.rotate(p.r); ctx.scale(1, Math.cos(p.t));
+    ctx.fillStyle = p.c;
+    if (p.circle){ ctx.beginPath(); ctx.arc(0, 0, p.w*.5*dpr, 0, 6.28); ctx.fill(); }
+    else ctx.fillRect(-p.w/2*dpr, -p.h/2*dpr, p.w*dpr, p.h*dpr);
+    ctx.restore();
+  }
+  raf = (parts.length || now < stopSpawn) ? requestAnimationFrame(tick) : null;
+  if (!raf) ctx.clearRect(0, 0, cv.width, cv.height);
+}
+
+render(); focusInput();
+</script>
+</body>
+</html>
