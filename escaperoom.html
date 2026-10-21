@@ -231,6 +231,23 @@ function tick(now){
   if (!raf) ctx.clearRect(0, 0, cv.width, cv.height);
 }
 
+/* Scherm actief houden */
+let wakeLock = null;
+async function keepAwake(){
+  try {
+    if ("wakeLock" in navigator && !wakeLock) {
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", () => { wakeLock = null; });
+    }
+  } catch (e) {}
+}
+keepAwake();
+document.addEventListener("pointerdown", keepAwake);
+document.addEventListener("keydown", keepAwake);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") keepAwake();
+});
+  
 render(); focusInput();
 </script>
 </body>
