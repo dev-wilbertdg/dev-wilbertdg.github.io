@@ -178,7 +178,7 @@ function check(){
 function win(){
   locked = true; render(); spin(540);
   setTimeout(() => { body.classList.add("won"); burst(); }, 600);
-  resetTimer = setTimeout(reset, 5600);   // 5 sec. na het openen terug
+  resetTimer = setTimeout(reset, 8000);   // 5 sec. na het openen terug
 }
 function reset(){
   clearTimeout(resetTimer);
@@ -203,7 +203,7 @@ function spawn(x, y, vx, vy){
 }
 function burst(){
   const W = innerWidth, H = innerHeight;
-  for (let i = 0; i < 160; i++){
+  for (let i = 0; i < 80; i++){
     spawn(0, H*.8, 8 + Math.random()*14, -(12 + Math.random()*16));
     spawn(W, H*.8, -(8 + Math.random()*14), -(12 + Math.random()*16));
   }
