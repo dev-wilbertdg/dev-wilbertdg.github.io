@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaSk Graph Academy</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        duoGreen: '#58cc02',
+                        duoGreenDark: '#46a302',
+                        duoBlue: '#1cb0f6',
+                        duoBlueDark: '#1899d6',
+                        duoOrange: '#ff9600',
+                        duoOrangeDark: '#e58700',
+                        duoPurple: '#ce82ff',
+                        duoPurpleDark: '#b561f5',
+                        duoRed: '#ff4b4b',
+                        duoRedDark: '#ea2b2b',
+                        duoGray: '#e5e7eb',
+                        duoDark: '#3c3c3c'
+                    },
+                    fontFamily: {
+                        sans: ['Nunito', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Font Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f7f9fa;
+            color: #3c3c3c;
+            user-select: none;
+        }
+
+        /* Duolingo 3D Button Utility */
+        .btn-duo {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-radius: 16px;
+            padding: 12px 24px;
+            transition: all 0.1s ease;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-duo-green {
+            background-color: #58cc02;
+            color: white;
+            box-shadow: 0 5px 0 #46a302;
+        }
+        .btn-duo-green:hover { background-color: #61e002; }
+        .btn-duo-green:active { transform: translateY(4px); box-shadow: 0 1px 0 #46a302; }
+
+        .btn-duo-blue {
+            background-color: #1cb0f6;
+            color: white;
+            box-shadow: 0 5px 0 #1899d6;
+        }
+        .btn-duo-blue:hover { background-color: #24b9ff; }
+        .btn-duo-blue:active { transform: translateY(4px); box-shadow: 0 1px 0 #1899d6; }
+
+        .btn-duo-orange {
+            background-color: #ff9600;
+            color: white;
+            box-shadow: 0 5px 0 #e58700;
+        }
+        .btn-duo-orange:active { transform: translateY(4px); box-shadow: 0 1px 0 #e58700; }
+
+        .btn-duo-gray {
+            background-color: #e5e7eb;
+            color: #6b7280;
+            box-shadow: 0 5px 0 #d1d5db;
+        }
+        .btn-duo-gray:active { transform: translateY(4px); box-shadow: 0 1px 0 #d1d5db; }
+
+        .btn-duo:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.1) !important;
+        }
+
+        /* Option Card Styles */
+        .quiz-card {
+            border: 2px solid #e5e7eb;
+            border-bottom: 5px solid #e5e7eb;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .quiz-card:hover {
+            border-color: #84d8ff;
+            background-color: #f4fbfd;
+        }
+        .quiz-card.selected {
+            border-color: #1cb0f6;
+            border-bottom-color: #1899d6;
+            background-color: #ddf4ff;
+        }
+        .quiz-card.correct {
+            border-color: #58cc02;
+            border-bottom-color: #46a302;
+            background-color: #d7ffb8;
+        }
+        .quiz-card.wrong {
+            border-color: #ff4b4b;
+            border-bottom-color: #ea2b2b;
+            background-color: #ffdfe0;
+        }
+
+        /* Progress Bar */
+        .progress-bar-bg {
+            background-color: #e5e7eb;
+            border-radius: 999px;
+            height: 16px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background-color: #58cc02;
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Bottom Feedback Banner */
+        .feedback-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(100%);
+            z-index: 50;
+        }
+        .feedback-banner.show {
+            transform: translateY(0);
+        }
+
+        /* Auto proceed timer indicator */
+        .timer-progress {
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.6);
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 3s linear;
+        }
+
+        /* Table Inputs */
+        .ratio-input {
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-weight: 800;
+            text-align: center;
+            width: 70px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .ratio-input:focus {
+            border-color: #1cb0f6;
+            box-shadow: 0 0 0 3px rgba(28, 176, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-white border-b-2 border-gray-200 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('quiz')">
+                <div class="w-10 h-10 rounded-2xl bg-duoGreen flex items-center justify-center text-white font-black text-xl shadow-md">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg leading-tight text-gray-800">NaSk Grafieken Oefenen</h1>
+                </div>
+            </div>
+
+            <!-- Stats Bar (Streak & XP) -->
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1.5 bg-orange-50 px-3 py-1.5 rounded-2xl border-2 border-duoOrange text-duoOrange font-black text-sm">
+                    <i class="fa-solid fa-fire text-base"></i>
+                    <span id="stat-streak">1</span>
+                </div>
+                <div class="flex items-center space-x-1.5 bg-yellow-50 px-3 py-1.5 rounded-2xl border-2 border-yellow-400 text-yellow-600 font-black text-sm">
+                    <i class="fa-solid fa-bolt text-base"></i>
+                    <span id="stat-xp">0</span> <span class="text-xs">XP</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode Navigation Tabs -->
+        <div class="max-w-5xl mx-auto px-4 flex space-x-2 overflow-x-auto py-2 border-t border-gray-100">
+            <button id="tab-quiz" onclick="switchTab('quiz')" class="nav-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-extrabold text-sm text-duoBlue bg-blue-50 border-2 border-duoBlue">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Grafiek Quiz</span>
+            </button>
+            <button id="tab-maker" onclick="switchTab('maker')" class="nav-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-extrabold text-sm text-gray-500 hover:bg-gray-100 border-2 border-transparent">
+                <i class="fa-solid fa-compass-drafting"></i>
+                <span>Grafiek Bouwer</span>
+            </button>
+            <button id="tab-ratio" onclick="switchTab('ratio')" class="nav-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-extrabold text-sm text-gray-500 hover:bg-gray-100 border-2 border-transparent">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Verhoudingstabel</span>
+            </button>
+            <button id="tab-theory" onclick="switchTab('theory')" class="nav-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-extrabold text-sm text-gray-500 hover:bg-gray-100 border-2 border-transparent">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Theorie & Regels</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- ==========================================================================
+             MODUS 1: GRAFIEK QUIZ
+             ========================================================================== -->
+        <section id="view-quiz" class="space-y-6">
+            
+            <!-- Progress & Level Bar -->
+            <div class="flex items-center space-x-4">
+                <button onclick="prevQuizQuestion()" class="text-gray-400 hover:text-gray-600 font-bold">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <div class="flex-grow progress-bar-bg">
+                    <div id="quiz-progress-bar" class="progress-bar-fill" style="width: 10%;"></div>
+                </div>
+                <span id="quiz-question-counter" class="font-extrabold text-xs text-gray-400">1 / 12</span>
+            </div>
+
+            <!-- Quiz Question Card -->
+            <div class="bg-white rounded-3xl p-6 border-2 border-gray-200 shadow-sm space-y-4">
+                <!-- Topic Tag & Prompt -->
+                <div class="flex items-center justify-between">
+                    <span id="quiz-topic-tag" class="text-xs font-black uppercase tracking-wider px-3 py-1 bg-blue-100 text-duoBlue rounded-full">
+                        Warmte & Temperatuur
+                    </span>
+                    <span class="text-xs font-bold text-gray-400"><i class="fa-regular fa-lightbulb"></i> Vraagstuk</span>
+                </div>
+
+                <h2 id="quiz-question-text" class="text-xl font-black text-gray-800 leading-snug">
+                    Wat is de temperatuur van de vloeistof op t = 7 minuten?
+                </h2>
+
+                <!-- Optional Subtext / Context -->
+                <p id="quiz-context-text" class="text-sm font-semibold text-gray-500">
+                    Bekijk de onderstaande NaSk-grafiek van het afkoelen van een vloeistof.
+                </p>
+
+                <!-- Interactive Graph Area / Visual -->
+                <div class="canvas-box p-4 flex flex-col items-center justify-center relative">
+                    <canvas id="quiz-canvas" width="540" height="320" class="max-w-full h-auto cursor-pointer"></canvas>
+                    <span id="quiz-canvas-hint" class="text-xs font-bold text-duoBlue mt-2 hidden">
+                        <i class="fa-solid fa-hand-pointer"></i> Klik direct op het juiste punt in de grafiek.
+                    </span>
+                </div>
+
+                <!-- Multiple Choice Options Grid -->
+                <div id="quiz-options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                    <!-- Dynamic Options -->
+                </div>
+            </div>
+
+            <!-- Action Area -->
+            <div class="flex justify-end pt-2">
+                <button id="quiz-check-btn" onclick="checkQuizAnswer()" class="btn-duo btn-duo-green w-full md:w-auto" disabled>
+                    Controleer Antwoord
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             MODUS 2: GRAFIEK BOUWER (INTERACTIEF STEPPER CANVAS)
+             ========================================================================== -->
+        <section id="view-maker" class="space-y-6 hidden">
+            
+            <!-- Header & Level Picker -->
+            <div class="bg-white p-4 rounded-2xl border-2 border-gray-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="font-black text-lg text-gray-800">Constructie van een NaSk-grafiek</h2>
+                    <p class="text-xs font-bold text-gray-400">Doorloop de 5 stappen om een correcte natuurkundige grafiek op te stellen.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <select id="maker-level-select" onchange="loadMakerLevel(this.value)" class="border-2 border-gray-200 rounded-xl px-3 py-1.5 font-bold text-sm outline-none focus:border-duoBlue">
+                        <!-- Populated by JS -->
+                    </select>
+                    <button onclick="generateRandomMakerLevel()" class="btn-duo btn-duo-orange py-2 px-3 text-xs">
+                        <i class="fa-solid fa-dice mr-1"></i> Willekeurig
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5 Steps Stepper Pill Bar -->
+            <div class="flex items-center justify-between bg-white p-2 rounded-2xl border-2 border-gray-200 overflow-x-auto space-x-1">
+                <button id="mstep-1" onclick="selectMakerStep(1)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-duoBlue bg-blue-50 text-duoBlue transition">1. Assen</button>
+                <button id="mstep-2" onclick="selectMakerStep(2)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">2. Schaal</button>
+                <button id="mstep-3" onclick="selectMakerStep(3)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">3. Punten</button>
+                <button id="mstep-4" onclick="selectMakerStep(4)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">4. Uitbijter</button>
+                <button id="mstep-5" onclick="selectMakerStep(5)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">5. Trendlijn</button>
+            </div>
+
+            <!-- Main Interactive Workspace -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Control Panel -->
+                <div class="lg:col-span-5 space-y-4">
+                    <!-- Dataset Table Card -->
+                    <div class="bg-white p-4 rounded-2xl border-2 border-gray-200 space-y-3">
+                        <h3 class="font-extrabold text-sm text-gray-700 flex items-center justify-between">
+                            <span><i class="fa-solid fa-table mr-1 text-duoBlue"></i> Meetgegevens</span>
+                            <span id="maker-dataset-title" class="text-xs font-bold text-gray-400">Thee afkoelen</span>
+                        </h3>
+                        <div class="overflow-hidden rounded-xl border border-gray-200">
+                            <table class="w-full text-left text-xs font-bold">
+                                <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase">
+                                    <tr>
+                                        <th id="th-maker-x" class="p-2">X-waarde</th>
+                                        <th id="th-maker-y" class="p-2">Y-waarde</th>
+                                        <th class="p-2 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="maker-table-body" class="divide-y divide-gray-100">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Step Instruction & Controls Card -->
+                    <div class="bg-white p-5 rounded-2xl border-2 border-gray-200 space-y-4">
+                        <div id="maker-step-instruction">
+                            <!-- Injected by step render -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Canvas Grid Panel -->
+                <div class="lg:col-span-7 space-y-2">
+                    <div class="canvas-box p-4 relative">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-extrabold text-gray-400"><i class="fa-solid fa-border-all"></i> Millimeterpapier Grid</span>
+                            <span id="maker-coords-hover" class="font-mono text-xs font-bold text-duoBlue bg-blue-50 px-2 py-0.5 rounded-md">X: - | Y: -</span>
+                        </div>
+                        <canvas id="maker-canvas" width="520" height="380" class="w-full h-auto cursor-crosshair bg-white rounded-lg"></canvas>
+                        <p id="maker-canvas-tip" class="text-center text-xs font-bold text-gray-400 mt-2">
+                            Klik op het papier om punten nauwkeurig te plaatsen of te selecteren.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             MODUS 3: VERHOUDINGSTABEL TRAINER
+             ========================================================================== -->
+        <section id="view-ratio" class="space-y-6 hidden">
+            
+            <div class="bg-white p-6 rounded-3xl border-2 border-gray-200 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <span class="text-xs font-black uppercase tracking-wider text-duoPurple bg-purple-100 px-3 py-1 rounded-full">Rekenen in NaSk</span>
+                        <h2 class="text-xl font-black text-gray-800 mt-2">Verhoudingstabellen Oefensessie</h2>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="ratio-type-select" onchange="generateRatioQuestion()" class="border-2 border-gray-200 rounded-xl px-3 py-2 font-bold text-sm outline-none focus:border-duoPurple">
+                            <option value="6">6-Vakjes Tabel (Kruisregel)</option>
+                            <option value="8">8-Vakjes Tabel (Via de 1)</option>
+                        </select>
+                        <button onclick="generateRatioQuestion()" class="btn-duo btn-duo-purple py-2 px-4 text-xs">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Nieuwe Opgave
+                        </button>
+                    </div>
+                </div>
+
+                <p id="ratio-problem-text" class="text-base font-extrabold text-gray-700 bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                    Een fietser legt in 15 minuten een afstand van 4,5 km af. Bereken met de verhoudingstabel de afstand in 45 minuten bij dezelfde snelheid.
+                </p>
+
+                <!-- Interactive Ratio Table Display -->
+                <div class="bg-purple-50 p-6 rounded-2xl border-2 border-purple-200 flex flex-col items-center justify-center space-y-4">
+                    <div id="ratio-table-render" class="overflow-x-auto w-full flex justify-center">
+                        <!-- Dynamic table injected -->
+                    </div>
+                    <p id="ratio-hint-text" class="text-xs font-bold text-purple-600">
+                        Vul de ontbrekende waarde in het lege vakje in.
+                    </p>
+                </div>
+
+                <div class="flex justify-end">
+                    <button id="ratio-check-btn" onclick="checkRatioAnswer()" class="btn-duo btn-duo-green w-full md:w-auto">
+                        Controleer Antwoord
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             MODUS 4: THEORIE & KENNISKAARTEN
+             ========================================================================== -->
+        <section id="view-theory" class="space-y-6 hidden">
+            
+            <div class="bg-white p-6 rounded-3xl border-2 border-gray-200 space-y-6">
+                <div>
+                    <span class="text-xs font-black uppercase tracking-wider text-duoBlue bg-blue-100 px-3 py-1 rounded-full">Theorie & Overzicht</span>
+                    <h2 class="text-2xl font-black text-gray-800 mt-2">5 tips voor het maken van grafieken</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Rule 1 -->
+                    <div class="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50 space-y-2">
+                        <div class="flex items-center space-x-2 text-duoBlue font-black">
+                            <span class="w-7 h-7 rounded-full bg-duoBlue text-white flex items-center justify-center text-xs">1</span>
+                            <h3>Assen Benoemen</h3>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 leading-relaxed">
+                            Vermeld altijd de <strong>Grootheid</strong>, het <strong>symbool</strong> en de <strong>eenheid</strong> bij de as tussen haakjes. Bijvoorbeeld: <em>Tijd t (min)</em> of <em>Temperatuur T (°C)</em>.
+                        </p>
+                    </div>
+
+                    <!-- Rule 2 -->
+                    <div class="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50 space-y-2">
+                        <div class="flex items-center space-x-2 text-duoOrange font-black">
+                            <span class="w-7 h-7 rounded-full bg-duoOrange text-white flex items-center justify-center text-xs">2</span>
+                            <h3>Tijd op de X-as</h3>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 leading-relaxed">
+                            Plaats de tijd (of de onafhankelijke variabele die je zelf instelt) <strong>altijd op de horizontale x-as</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Rule 3 -->
+                    <div class="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50 space-y-2">
+                        <div class="flex items-center space-x-2 text-duoGreen font-black">
+                            <span class="w-7 h-7 rounded-full bg-duoGreen text-white flex items-center justify-center text-xs">3</span>
+                            <h3>Gelijke Stapgrootte</h3>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 leading-relaxed">
+                            Kies een regelmatige schaalverdeling (bijv. stappen van +2, +5 of +10). Zet nooit rechtstreeks onregelmatige meetwaarden op de assen.
+                        </p>
+                    </div>
+
+                    <!-- Rule 4 -->
+                    <div class="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50 space-y-2">
+                        <div class="flex items-center space-x-2 text-duoPurple font-black">
+                            <span class="w-7 h-7 rounded-full bg-duoPurple text-white flex items-center justify-center text-xs">4</span>
+                            <h3>Meetfout Omcirkelen</h3>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 leading-relaxed">
+                            Identificeer een duidelijke afwijking als een <strong>meetfout</strong> en omcirkel deze. Laat de trendlijn hier niet naartoe afwijken.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Trendline Types Rule -->
+                <div class="p-5 rounded-2xl border-2 border-green-200 bg-green-50 space-y-2">
+                    <h3 class="font-black text-green-800 text-sm flex items-center">
+                        <i class="fa-solid fa-wave-square mr-2"></i> Tip 5: Keuze van de Trendlijn
+                    </h3>
+                    <p class="text-xs font-bold text-green-700 leading-relaxed">
+                        Trek een strakke rechte lijn met een liniaal bij een <strong>recht evenredig verband</strong>. Gebruik een <strong>vloeiende kromme</strong> bij geleidelijke fysische veranderingen (zoals opwarmen of afkoelen). Verbind punten nooit met een hoekige zaagtandlijn.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BOTTOM DUOLINGO FEEDBACK BANNER -->
+    <div id="feedback-banner" class="feedback-banner bg-white border-t-4 shadow-2xl">
+        <div id="fb-timer-bar" class="timer-progress hidden"></div>
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-start space-x-4">
+                <div id="fb-icon-box" class="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-2xl flex-shrink-0">
+                    <i id="fb-icon" class="fa-solid fa-check"></i>
+                </div>
+                <div>
+                    <h3 id="fb-title" class="font-black text-lg">Correct!</h3>
+                    <p id="fb-message" class="text-sm font-bold opacity-90 max-w-xl">
+                        Dit is de juiste interpretatie.
+                    </p>
+                </div>
+            </div>
+            <button id="fb-next-btn" onclick="handleBannerProceed()" class="btn-duo btn-duo-green px-8">
+                Doorgaan <span id="fb-auto-count" class="ml-1 text-xs opacity-80"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- AUDIO SYNTHESIZER & JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. GLOBAL STATE & SYNTHESIZER
+           ========================================================================== */
+        let state = {
+            currentTab: 'quiz',
+            quizIdx: 0,
+            xp: 0,
+            streak: 1,
+            selectedOptionIdx: null,
+            clickedOutlierIdx: null,
+            makerLevelIdx: 0,
+            makerStep: 1,
+            ratioAnswer: null,
+            bannerAction: null
+        };
+
+        let autoProceedTimeout = null;
+
+        let userMakerState = {
+            xChoice: null,
+            xMax: 10,
+            xStep: 2,
+            yMax: 100,
+            yStep: 20,
+            points: [],
+            outlierIdx: null,
+            lineType: null
+        };
+
+        let activeQuizQuestions = [];
+
+        function playSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, ctx.currentTime);
+                    osc.frequency.setValueAtTime(140, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.35);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.08);
+                }
+            } catch(e) {}
+        }
+
+        /* Helper function for clean round axis scales */
+        function getNiceScale(dataMax, numSteps = 5) {
+            if (!dataMax || dataMax <= 0) dataMax = 10;
+            let rawStep = dataMax / numSteps;
+            let magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+            let residual = rawStep / magnitude;
+            let niceStep;
+            if (residual <= 1.2) niceStep = 1 * magnitude;
+            else if (residual <= 2.2) niceStep = 2 * magnitude;
+            else if (residual <= 3.5) niceStep = 2.5 * magnitude;
+            else if (residual <= 7.5) niceStep = 5 * magnitude;
+            else niceStep = 10 * magnitude;
+
+            let niceMax = Math.ceil(dataMax / niceStep) * niceStep;
+            if (niceMax === dataMax) niceMax += niceStep;
+            return { max: niceMax, step: niceStep };
+        }
+
+        /* ==========================================================================
+           2. QUIZ QUESTIONS DATABASE (KLAS 1 PERIODE 1)
+           ========================================================================== */
+        const QUIZ_QUESTIONS = [
+            {
+                id: 1,
+                topic: "Warmte & Temperatuur",
+                question: "Op t = 7 minuten koelt hete thee af. Lees op de vloeiende trendlijn af wat de temperatuur is.",
+                context: "Een leerling meet het afkoelen van thee. Er is één duidelijke meetfout omcirkeld.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:80}, {x:2, y:65}, {x:4, y:52}, {x:6, y:30}, {x:8, y:36}, {x:10, y:30}],
+                outlierIdx: 3, // at x=6, expected ~43°C, point is at 30°C
+                lineType: "smooth",
+                options: ["43 °C", "30 °C", "52 °C", "36 °C"],
+                correctIdx: 0,
+                explanation: "Bij t = 7 min ligt de vloeiende trendlijn op precies 43 °C. De meting van 30 °C bij t = 6 min is een meetfout en telt niet mee!"
+            },
+            {
+                id: 2,
+                topic: "Beweging & Tijd",
+                question: "Een fietser maakt een tocht. Welke grootheid hoort op de horizontale X-as?",
+                context: "Je houdt elke 5 minuten de afgelegde afstand s in km bij.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Afstand s (km)",
+                options: ["Tijd t (min)", "Afstand s (km)", "Snelheid v (km/h)", "Massa m (kg)"],
+                correctIdx: 0,
+                explanation: "Tijd t (min) is de variabele die gelijkmatig doorloopt en komt bij NaSk ALTIJD op de horizontale X-as."
+            },
+            {
+                id: 3,
+                topic: "Stoffen & Massa",
+                question: "Klik direct op het punt in de grafiek dat overduidelijk een MEETFOUT is.",
+                context: "Metingen van het volume V (cm³) en de massa m (g) van zonnebloemolie.",
+                type: "click-outlier",
+                xLabel: "Volume V (cm³)",
+                yLabel: "Massa m (g)",
+                data: [{x:0, y:0}, {x:10, y:9}, {x:20, y:18}, {x:30, y:27}, {x:40, y:48}, {x:50, y:45}],
+                outlierIdx: 4, // at V=40, expected 36g, measured 48g
+                lineType: "straight",
+                explanation: "Het punt bij V = 40 cm³ ligt op 48 g (in plaats van de verwachte 36 g). Dit is de afwijkende meetfout."
+            },
+            {
+                id: 4,
+                topic: "Extrapoleren",
+                question: "Trek de trendlijn in gedachten door. Welke afstand heeft de fietser afgelegd bij t = 30 min?",
+                context: "Een fietser rijdt met een constante snelheid.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Afstand s (km)",
+                data: [{x:0, y:0}, {x:5, y:2}, {x:10, y:4}, {x:15, y:6}, {x:20, y:8}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["12 km", "10 km", "15 km", "8 km"],
+                correctIdx: 0,
+                explanation: "De fietser legt elke 5 minuten 2 km af. Bij t = 30 min is de afstand dus 6 × 2 = 12 km (extrapoleren)."
+            },
+            {
+                id: 5,
+                topic: "Smelten & Faseovergang",
+                question: "Waarom loopt de grafiek tussen t = 4 min en t = 8 min helemaal horizontaal?",
+                context: "Opwarmen en smelten van een vaste stof in een reageerbuis.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:20}, {x:2, y:45}, {x:4, y:69}, {x:6, y:69}, {x:8, y:69}, {x:10, y:85}],
+                outlierIdx: -1,
+                lineType: "plateau",
+                options: [
+                    "De stof is aan het smelten (faseovergang, T blijft gelijk)",
+                    "De brander is uitgedaan",
+                    "Er is een meetfout gemaakt",
+                    "De stof koelt af"
+                ],
+                correctIdx: 0,
+                explanation: "Tijdens een faseovergang (zoals smelten bij 69 °C) blijft de temperatuur constant totdat alle stof gesmolten is. Daarom is dit een strakke horizontale lijn."
+            },
+            {
+                id: 6,
+                topic: "Grafiekregels",
+                question: "Wat is er FOUT aan een assenlabel dat genoteerd is als alleen: 'Temperatuur'?",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                options: [
+                    "De eenheid (zoals °C) en het symbool (T) ontbreken",
+                    "Temperatuur hoort nooit op een as",
+                    "Het moet in het Engels genoteerd worden",
+                    "Het symbool moet altijd een X zijn"
+                ],
+                correctIdx: 0,
+                explanation: "Regel 1 zegt: vermeld altijd Grootheid, Symbool én Eenheid tussen haakjes! Dus: Temperatuur T (°C)."
+            },
+            {
+                id: 7,
+                topic: "Warmte & Koken",
+                question: "Een waterkoker verwarmt water. Wat is de temperatuur van het water na t = 3 minuten?",
+                context: "Water wordt opgewarmd van kamertemperatuur (20 °C) tot kookpunt.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:20}, {x:1, y:40}, {x:2, y:60}, {x:3, y:80}, {x:4, y:100}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["80 °C", "60 °C", "100 °C", "40 °C"],
+                correctIdx: 0,
+                explanation: "Bij t = 3 min snijdt de rechte lijn precies de waarde 80 °C op de verticale as."
+            },
+            {
+                id: 8,
+                topic: "Stoffen & Dichtheid",
+                question: "Lees op de rechte trendlijn af wat de massa is bij een volume van V = 25 cm³ hout.",
+                context: "Massa m (g) van een blokje eikenhout bij verschillende volumina V (cm³).",
+                type: "mc",
+                xLabel: "Volume V (cm³)",
+                yLabel: "Massa m (g)",
+                data: [{x:0, y:0}, {x:10, y:8}, {x:20, y:16}, {x:30, y:24}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["20 gram", "16 gram", "24 gram", "12 gram"],
+                correctIdx: 0,
+                explanation: "Precies op de helft tussen V = 20 cm³ (16 g) en V = 30 cm³ (24 g) lees je een massa van 20 gram af."
+            },
+            {
+                id: 9,
+                topic: "Geluid",
+                question: "Hoeveel meter legt geluid in lucht af in t = 4 seconden?",
+                context: "Metingen van de afstand s tot een geluidsbron op basis van tijd t.",
+                type: "mc",
+                xLabel: "Tijd t (s)",
+                yLabel: "Afstand s (m)",
+                data: [{x:0, y:0}, {x:1, y:340}, {x:2, y:680}, {x:3, y:1020}, {x:5, y:1700}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["1360 meter", "1020 meter", "1700 meter", "1200 meter"],
+                correctIdx: 0,
+                explanation: "Geluid legt 340 meter per seconde af. Na 4 seconden is de afstand 4 × 340 = 1360 meter."
+            },
+            {
+                id: 10,
+                topic: "Brandende Kaars",
+                question: "Klik direct op het punt in de grafiek dat een duidelijke MEETFOUT is.",
+                context: "De lengte L van een kaars in cm gemeten over de tijd t in uren.",
+                type: "click-outlier",
+                xLabel: "Tijd t (uur)",
+                yLabel: "Lengte L (cm)",
+                data: [{x:0, y:20}, {x:1, y:18}, {x:2, y:16}, {x:3, y:18}, {x:4, y:12}, {x:5, y:10}],
+                outlierIdx: 3, // expected 14cm, measured 18cm
+                lineType: "straight",
+                explanation: "Bij t = 3 uur geeft de meting 18 cm aan (terwijl de kaars geleidelijk korter wordt naar 14 cm). Dit is een uitbijter."
+            },
+            {
+                id: 11,
+                topic: "Tijd & Afstand",
+                question: "Lees uit de grafiek af hoeveel kilometer de auto na 1,5 uur heeft gereden.",
+                context: "Een auto rijdt met constante snelheid over de snelweg.",
+                type: "mc",
+                xLabel: "Tijd t (uur)",
+                yLabel: "Afstand s (km)",
+                data: [{x:0, y:0}, {x:1, y:100}, {x:2, y:200}, {x:3, y:300}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["150 km", "100 km", "200 km", "125 km"],
+                correctIdx: 0,
+                explanation: "Bij t = 1,5 uur snijdt de lijn de verticale as precies halverwege 100 en 200, dus 150 km."
+            },
+            {
+                id: 12,
+                topic: "Grafiekregels",
+                question: "Waarom gebruiken we geen hoekige 'zaagtandlijn' (punt-naar-punt) in een NaSk-grafiek?",
+                type: "mc",
+                xLabel: "Tijd t (s)",
+                yLabel: "Temperatuur T (°C)",
+                options: [
+                    "Omdat metingen soms afwijken (meetfouten) en de natuur juist geleidelijk verandert.",
+                    "Omdat dat er niet mooi uitziet.",
+                    "Omdat een zaagtandlijn alleen bij wiskunde mag.",
+                    "Omdat je altijd een liniaal moet gebruiken."
+                ],
+                correctIdx: 0,
+                explanation: "Een trendlijn (rechte lijn of vloeiende kromme) laat het werkelijke natuurkundige verloop zien en filtert kleine meetfoutjes eruit."
+            },
+            {
+                id: 13,
+                topic: "Stollen & Faseovergang",
+                question: "Bij welke temperatuur stolt (bevriest) deze vloeistof?",
+                context: "Een warme vloeistof koelt af en wordt vast.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:80}, {x:2, y:60}, {x:4, y:45}, {x:6, y:45}, {x:8, y:45}, {x:10, y:20}],
+                outlierIdx: -1,
+                lineType: "plateau",
+                options: ["45 °C", "80 °C", "20 °C", "60 °C"],
+                correctIdx: 0,
+                explanation: "Tijdens een faseovergang (zoals stollen) blijft de temperatuur constant. Het horizontale plateau ligt hier op 45 °C."
+            },
+            {
+                id: 14,
+                topic: "Warmte & Temperatuur",
+                question: "Klik direct op de MEETFOUT in deze opwarmkromme.",
+                context: "Water in een bekerglas wordt gelijkmatig verwarmd.",
+                type: "click-outlier",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:20}, {x:2, y:30}, {x:4, y:40}, {x:6, y:30}, {x:8, y:60}, {x:10, y:70}],
+                outlierIdx: 3, 
+                lineType: "straight",
+                explanation: "Bij t = 6 min is 30 °C gemeten, terwijl de temperatuur volgens de trendlijn 50 °C zou moeten zijn."
+            },
+            {
+                id: 15,
+                topic: "Grafiekregels",
+                question: "Een leerling maakt de stappen op de y-as als volgt: 0, 2, 5, 6, 12, 15. Wat is hier fout aan?",
+                type: "mc",
+                xLabel: "Tijd t (s)",
+                yLabel: "Afstand s (m)",
+                options: [
+                    "De stappen zijn niet even groot (geen gelijke stapgrootte).",
+                    "Je moet altijd stappen van 10 gebruiken.",
+                    "Er staan geen eenheden bij de getallen.",
+                    "De getallen zijn te klein."
+                ],
+                correctIdx: 0,
+                explanation: "Kies een regelmatige schaalverdeling (bijv. telkens +5). Zet nooit direct je meetwaarden op de as als de stappen daardoor ongelijk worden!"
+            },
+            {
+                id: 16,
+                topic: "Dichtheid & Volume",
+                question: "Wat is de massa van 15 cm³ van dit metaal?",
+                context: "Grafiek van volume V en massa m van een metaal.",
+                type: "mc",
+                xLabel: "Volume V (cm³)",
+                yLabel: "Massa m (g)",
+                data: [{x:0, y:0}, {x:10, y:30}, {x:20, y:60}, {x:30, y:90}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["45 g", "30 g", "60 g", "50 g"],
+                correctIdx: 0,
+                explanation: "Bij V = 15 cm³ (precies tussen 10 en 20) lees je een massa af van 45 g (tussen 30 en 60 in)."
+            },
+            {
+                id: 17,
+                topic: "Grafiekregels",
+                question: "Waarom zetten we een meetfout NIET op de trendlijn?",
+                type: "mc",
+                xLabel: "Volume V (cm³)",
+                yLabel: "Massa m (g)",
+                options: [
+                    "Omdat een trendlijn het betrouwbare verloop aangeeft, en we uitschieters negeren.",
+                    "Omdat de docent dat mooier vindt.",
+                    "Omdat de grafiek dan niet meer op het papier past.",
+                    "Omdat een meetfout altijd te hoog is."
+                ],
+                correctIdx: 0,
+                explanation: "De trendlijn toont het natuurkundige verband. Een foute meting trekt die lijn scheef, dus die negeren we bij het tekenen."
+            },
+            {
+                id: 18,
+                topic: "Geluid",
+                question: "Hoe lang duurt het voordat je de klap hoort op 850 meter afstand?",
+                context: "Verband tussen tijd en afstand voor geluid.",
+                type: "mc",
+                xLabel: "Tijd t (s)",
+                yLabel: "Afstand s (m)",
+                data: [{x:0, y:0}, {x:1, y:340}, {x:2, y:680}, {x:3, y:1020}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["2,5 s", "2,0 s", "3,0 s", "1,5 s"],
+                correctIdx: 0,
+                explanation: "Bij s = 850 m (precies in het midden van 680 en 1020) hoort een tijd van t = 2,5 s."
+            },
+            {
+                id: 19,
+                topic: "Tijd & Afstand",
+                question: "Klik direct op het punt waaruit blijkt dat er een meetfout is gemaakt.",
+                context: "Een fietser rijdt met een constante snelheid.",
+                type: "click-outlier",
+                xLabel: "Tijd t (min)",
+                yLabel: "Afstand s (km)",
+                data: [{x:0, y:0}, {x:10, y:3}, {x:20, y:6}, {x:30, y:6}, {x:40, y:12}, {x:50, y:15}],
+                outlierIdx: 3, 
+                lineType: "straight",
+                explanation: "Op t = 30 min geeft de afstand 6 km aan, terwijl de constante rechte trendlijn op dat punt 9 km voorspelt."
+            },
+            {
+                id: 20,
+                topic: "Koken van water",
+                question: "Na hoeveel minuten begon het water te koken?",
+                context: "Water in een pannetje wordt opgewarmd en gaat koken.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:20}, {x:2, y:60}, {x:4, y:100}, {x:6, y:100}, {x:8, y:100}],
+                outlierIdx: -1,
+                lineType: "plateau",
+                options: ["4 min", "6 min", "8 min", "2 min"],
+                correctIdx: 0,
+                explanation: "Vanaf t = 4 minuten blijft de temperatuur constant (het plateau) op 100 °C. Dit is de faseovergang (koken)."
+            },
+            {
+                id: 21,
+                topic: "Grafiekregels",
+                question: "In een grafiek is het symbool en de eenheid vergeten op de horizontale as. Welke van de volgende keuzes is wél compleet en correct?",
+                type: "mc",
+                xLabel: "Volume",
+                yLabel: "Massa m (g)",
+                options: [
+                    "Tijd t (s)",
+                    "Tijd (s)",
+                    "t (seconden)",
+                    "Tijd in seconden"
+                ],
+                correctIdx: 0,
+                explanation: "Je moet altijd de grootheid (Tijd), het symbool (t) en de eenheid (s) tussen haakjes noteren. Alleen antwoord A heeft ze alle drie."
+            },
+            {
+                id: 22,
+                topic: "Extrapoleren",
+                question: "Als de kaars in dit tempo verder opbrandt, op welk tijdstip is hij dan helemaal op (L = 0 cm)?",
+                context: "De lengte van een kaars L over de tijd t.",
+                type: "mc",
+                xLabel: "Tijd t (uur)",
+                yLabel: "Lengte L (cm)",
+                data: [{x:0, y:20}, {x:1, y:15}, {x:2, y:10}, {x:3, y:5}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["4 uur", "5 uur", "3,5 uur", "6 uur"],
+                correctIdx: 0,
+                explanation: "De kaars wordt elk uur 5 cm korter. Na 3 uur is hij 5 cm lang, dus één uur later (na 4 uur in totaal) is hij 0 cm."
+            },
+            {
+                id: 23,
+                topic: "Stoffen & Dichtheid",
+                question: "Klik direct op de MEETFOUT bij de volumebepaling van dit koperen blokje.",
+                context: "Het meten van massa vs. volume bij koper.",
+                type: "click-outlier",
+                xLabel: "Volume V (cm³)",
+                yLabel: "Massa m (g)",
+                data: [{x:0, y:0}, {x:2, y:18}, {x:4, y:36}, {x:6, y:45}, {x:8, y:72}, {x:10, y:90}],
+                outlierIdx: 3, 
+                lineType: "straight",
+                explanation: "Het meetpunt bij V = 6 cm³ zou op 54 gram moeten liggen volgens de rechte evenredige trendlijn, maar ligt te laag (45 gram)."
+            },
+            {
+                id: 24,
+                topic: "Warmte & Temperatuur",
+                question: "Wat was de starttemperatuur (t = 0) van deze vloeistof voordat de koeling begon?",
+                context: "Afkoelkromme van een vloeistof in een koelkast.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:60}, {x:5, y:40}, {x:10, y:25}, {x:15, y:15}, {x:20, y:8}],
+                outlierIdx: -1,
+                lineType: "smooth",
+                options: ["60 °C", "40 °C", "0 °C", "8 °C"],
+                correctIdx: 0,
+                explanation: "Bij de start op t = 0 snijdt de grafiek de y-as precies bij de temperatuur van 60 °C."
+            },
+            {
+                id: 25,
+                topic: "Tijd & Afstand",
+                question: "Lees de grafiek af: wat is de snelheid van deze auto?",
+                context: "Een grafiek van een autorit over de snelweg.",
+                type: "mc",
+                xLabel: "Tijd t (uur)",
+                yLabel: "Afstand s (km)",
+                data: [{x:0, y:0}, {x:1, y:80}, {x:2, y:160}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["80 km/u", "160 km/u", "40 km/u", "20 km/u"],
+                correctIdx: 0,
+                explanation: "In precies 1 uur rijdt de auto 80 km (afgelezen op de kruising van t=1 en de grafieklijn). De constante snelheid is dus 80 km/u."
+            },
+            {
+                id: 26,
+                topic: "Grafiekregels",
+                question: "Je moet een temperatuurgrafiek tekenen. De meetwaarden zijn: 12 °C, 15 °C, 22 °C, 30 °C. Hoe verdeel je de Y-as het best?",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                options: [
+                    "Met gelijke stappen van 5 of 10 (bijv. 0, 10, 20, 30, 40).",
+                    "Door de getallen 12, 15, 22 en 30 direct op de as te schrijven.",
+                    "Met stappen van 1 (0, 1, 2... helemaal tot 30).",
+                    "Met stappen van 15."
+                ],
+                correctIdx: 0,
+                explanation: "Stappen van 5 of 10 zorgen voor een gelijkmatige, ronde schaalverdeling die overzichtelijk is. Direct je meetwaarden opschrijven (optie B) is absoluut verboden!"
+            },
+            {
+                id: 27,
+                topic: "Smelten & Faseovergang",
+                question: "Klik direct op de uitbijter (meetfout) in deze smeltkromme.",
+                context: "Het opwarmen en smelten van ijsblokjes.",
+                type: "click-outlier",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:-10}, {x:2, y:0}, {x:4, y:0}, {x:6, y:0}, {x:8, y:5}, {x:10, y:20}],
+                outlierIdx: 4, 
+                lineType: "plateau",
+                explanation: "Na het horizontale smeltplateau bij 0 °C hoort de temperatuur bij t = 8 (volgens de opwarmkromme richting 20 °C) ongeveer 10 °C te zijn, niet 5 °C."
+            },
+            {
+                id: 28,
+                topic: "Stoffen & Dichtheid",
+                question: "Bij welk volume is de massa precies 50 gram?",
+                context: "Verband tussen massa en volume van een onbekende vloeistof.",
+                type: "mc",
+                xLabel: "Volume V (cm³)",
+                yLabel: "Massa m (g)",
+                data: [{x:0, y:0}, {x:10, y:20}, {x:20, y:40}, {x:30, y:60}],
+                outlierIdx: -1,
+                lineType: "straight",
+                options: ["25 cm³", "20 cm³", "30 cm³", "15 cm³"],
+                correctIdx: 0,
+                explanation: "Tussen m = 40 en m = 60 ligt precies in het midden de 50 gram. Dit snijdt de x-as exact halverwege V = 20 en V = 30, dus 25 cm³."
+            },
+            {
+                id: 29,
+                topic: "Extrapoleren",
+                question: "Als we terug in de tijd extrapoleren: hoe warm was het theewater dan ongeveer op t = -2 minuten?",
+                context: "Het afkoelen van theewater na inschenken.",
+                type: "mc",
+                xLabel: "Tijd t (min)",
+                yLabel: "Temperatuur T (°C)",
+                data: [{x:0, y:80}, {x:2, y:60}, {x:4, y:45}],
+                outlierIdx: -1,
+                lineType: "smooth",
+                options: ["Ongeveer 100 °C", "60 °C", "120 °C", "0 °C"],
+                correctIdx: 0,
+                explanation: "Gezien de steile vloeiende kromme naar boven bij het extrapoleren (terug in de tijd) wijst het verloop logischerwijs richting het kookpunt van water (ongeveer 100 °C)."
+            },
+            {
+                id: 30,
+                topic: "Tijd & Afstand",
+                question: "Klik direct op het foute meetpunt in deze sprint-grafiek.",
+                context: "Een atleet trekt een versnellende sprint.",
+                type: "click-outlier",
+                xLabel: "Tijd t (s)",
+                yLabel: "Afstand s (m)",
+                data: [{x:0, y:0}, {x:2, y:4}, {x:4, y:16}, {x:6, y:30}, {x:8, y:64}, {x:10, y:100}],
+                outlierIdx: 3, 
+                lineType: "smooth",
+                explanation: "Omdat de loper versnelt is dit een parabolische (vloeiende) kromme omhoog. Het punt bij t = 6 valt hier te laag uit (30 m in plaats van ongeveer 36 m)."
+            }
+        ];
+
+        /* ==========================================================================
+           3. PRESET MAKER LEVELS
+           ========================================================================== */
+        const MAKER_LEVELS = [
+            {
+                title: "Afkoelen van warme thee",
+                xGrootheid: "Tijd", xSymbol: "t", xEenheid: "min",
+                yGrootheid: "Temperatuur", ySymbol: "T", yEenheid: "°C",
+                data: [{x:0, y:80}, {x:2, y:66}, {x:4, y:54}, {x:6, y:32}, {x:8, y:38}, {x:10, y:32}],
+                outlierIdx: 3, // at x=6, expects ~44°C, measured 32°C
+                suggXMax: 12, suggXStep: 2,
+                suggYMax: 100, suggYStep: 20,
+                lineType: "smooth"
+            },
+            {
+                title: "Opwarmen van water in waterkoker",
+                xGrootheid: "Tijd", xSymbol: "t", xEenheid: "min",
+                yGrootheid: "Temperatuur", ySymbol: "T", yEenheid: "°C",
+                data: [{x:0, y:20}, {x:1, y:40}, {x:2, y:60}, {x:3, y:72}, {x:4, y:100}],
+                outlierIdx: 3, // at x=3, expects 80°C, measured 72°C
+                suggXMax: 5, suggXStep: 1,
+                suggYMax: 100, suggYStep: 20,
+                lineType: "straight"
+            },
+            {
+                title: "Massa van eikenhout",
+                xGrootheid: "Volume", xSymbol: "V", xEenheid: "cm³",
+                yGrootheid: "Massa", ySymbol: "m", yEenheid: "g",
+                data: [{x:0, y:0}, {x:10, y:8}, {x:20, y:16}, {x:30, y:31}, {x:40, y:32}],
+                outlierIdx: 3, // at x=30, expects 24g, measured 31g
+                suggXMax: 50, suggXStep: 10,
+                suggYMax: 50, suggYStep: 10,
+                lineType: "straight"
+            }
+        ];
+
+        /* ==========================================================================
+           4. NAVIGATION & TAB SWITCHING
+           ========================================================================== */
+        function switchTab(tab) {
+            playSound('click');
+            state.currentTab = tab;
+            ['quiz', 'maker', 'ratio', 'theory'].forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tab) {
+                    view.classList.remove('hidden');
+                    btn.className = "nav-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-extrabold text-sm text-duoBlue bg-blue-50 border-2 border-duoBlue";
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = "nav-btn flex items-center space-x-2 px-4 py-2 rounded-xl font-extrabold text-sm text-gray-500 hover:bg-gray-100 border-2 border-transparent";
+                }
+            });
+
+            hideFeedbackBanner();
+
+            if (tab === 'quiz') {
+                renderQuizQuestion();
+            } else if (tab === 'maker') {
+                renderMakerCanvas();
+            } else if (tab === 'ratio') {
+                generateRatioQuestion();
+            }
+        }
+
+        /* ==========================================================================
+           5. QUIZ ENGINE
+           ========================================================================== */
+        function shuffleQuizQuestions() {
+            activeQuizQuestions = [...QUIZ_QUESTIONS].sort(() => Math.random() - 0.5);
+            state.quizIdx = 0;
+        }
+
+        function renderQuizQuestion() {
+            hideFeedbackBanner();
+            state.selectedOptionIdx = null;
+            state.clickedOutlierIdx = null;
+
+            if (state.quizIdx >= activeQuizQuestions.length) {
+                shuffleQuizQuestions();
+            }
+
+            const q = activeQuizQuestions[state.quizIdx];
+
+            document.getElementById('quiz-question-counter').innerText = `${state.quizIdx + 1} / ${activeQuizQuestions.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((state.quizIdx + 1) / activeQuizQuestions.length) * 100}%`;
+
+            document.getElementById('quiz-topic-tag').innerText = q.topic;
+            document.getElementById('quiz-question-text').innerText = q.question;
+            document.getElementById('quiz-context-text').innerText = q.context || "";
+
+            const canvasHint = document.getElementById('quiz-canvas-hint');
+            if (q.type === 'click-outlier') {
+                canvasHint.classList.remove('hidden');
+            } else {
+                canvasHint.classList.add('hidden');
+            }
+
+            const grid = document.getElementById('quiz-options-grid');
+            grid.innerHTML = '';
+
+            if (q.type === 'mc') {
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('div');
+                    btn.className = `quiz-card p-4 flex items-center justify-between font-extrabold text-sm text-gray-700`;
+                    btn.onclick = () => selectQuizOption(idx);
+                    btn.innerHTML = `
+                        <span>${opt}</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs text-transparent check-dot">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    `;
+                    grid.appendChild(btn);
+                });
+            } else if (q.type === 'click-outlier') {
+                grid.innerHTML = `
+                    <div class="col-span-2 p-4 bg-blue-50 border-2 border-duoBlue rounded-2xl text-center font-extrabold text-sm text-duoBlue">
+                        <i class="fa-solid fa-arrow-up mr-2"></i> Klik op het verkeerde punt in de grafiek om het antwoord te selecteren.
+                    </div>
+                `;
+            }
+
+            const checkBtn = document.getElementById('quiz-check-btn');
+            checkBtn.disabled = true;
+
+            renderQuizCanvas(q);
+        }
+
+        function selectQuizOption(idx) {
+            playSound('click');
+            state.selectedOptionIdx = idx;
+            const cards = document.querySelectorAll('#quiz-options-grid .quiz-card');
+            cards.forEach((card, i) => {
+                if (i === idx) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            document.getElementById('quiz-check-btn').disabled = false;
+        }
+
+        function checkQuizAnswer() {
+            const q = activeQuizQuestions[state.quizIdx];
+            let isCorrect = false;
+
+            if (q.type === 'mc') {
+                isCorrect = (state.selectedOptionIdx === q.correctIdx);
+            } else if (q.type === 'click-outlier') {
+                isCorrect = (state.clickedOutlierIdx === q.outlierIdx);
+            }
+
+            if (isCorrect) {
+                playSound('correct');
+                state.xp += 15;
+                state.streak += 1;
+                const xpElem = document.getElementById('stat-xp');
+                if (xpElem) xpElem.innerText = state.xp;
+                const streakElem = document.getElementById('stat-streak');
+                if (streakElem) streakElem.innerText = state.streak;
+                showFeedbackBanner(true, "Uitstekend!", q.explanation);
+            } else {
+                playSound('wrong');
+                state.streak = 1;
+                const streakElem = document.getElementById('stat-streak');
+                if (streakElem) streakElem.innerText = state.streak;
+                showFeedbackBanner(false, "Niet helemaal...", q.explanation);
+            }
+
+            state.bannerAction = () => {
+                state.quizIdx++;
+                renderQuizQuestion();
+            };
+        }
+
+        function handleQuizCanvasClick(e) {
+            const q = activeQuizQuestions[state.quizIdx];
+            if (q.type !== 'click-outlier') return;
+
+            const canvas = document.getElementById('quiz-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            const padL = 65, padB = 45, padR = 25, padT = 25;
+            const gW = canvas.width - padL - padR;
+            const gH = canvas.height - padT - padB;
+
+            const rawMaxX = Math.max(...q.data.map(p => p.x));
+            const rawMaxY = Math.max(...q.data.map(p => p.y));
+            const maxX = getNiceScale(rawMaxX, 5).max;
+            const maxY = getNiceScale(rawMaxY, 5).max;
+
+            let closestIdx = -1;
+            let minDistance = 30;
+
+            q.data.forEach((pt, idx) => {
+                const px = padL + (pt.x / maxX) * gW;
+                const py = (canvas.height - padB) - (pt.y / maxY) * gH;
+                const dist = Math.hypot(clickX - px, clickY - py);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestIdx = idx;
+                }
+            });
+
+            if (closestIdx !== -1) {
+                playSound('click');
+                state.clickedOutlierIdx = closestIdx;
+                renderQuizCanvas(q);
+                document.getElementById('quiz-check-btn').disabled = false;
+            }
+        }
+
+        function nextQuizQuestion() {
+            state.quizIdx++;
+            renderQuizQuestion();
+        }
+
+        function prevQuizQuestion() {
+            if (state.quizIdx > 0) {
+                state.quizIdx--;
+                renderQuizQuestion();
+            }
+        }
+
+        function renderQuizCanvas(q) {
+            const canvas = document.getElementById('quiz-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (!q.data) {
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, w, h);
+                return;
+            }
+
+            const padL = 65, padB = 45, padR = 25, padT = 25;
+            const gW = w - padL - padR, gH = h - padT - padB;
+
+            const rawMaxX = Math.max(...q.data.map(p => p.x));
+            const rawMaxY = Math.max(...q.data.map(p => p.y));
+
+            const scaleX = getNiceScale(rawMaxX, 5);
+            const scaleY = getNiceScale(rawMaxY, 5);
+
+            const maxX = scaleX.max;
+            const stepX = scaleX.step;
+            const maxY = scaleY.max;
+            const stepY = scaleY.step;
+
+            const toPxX = v => padL + (v / maxX) * gW;
+            const toPxY = v => (h - padB) - (v / maxY) * gH;
+
+            // Background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            // GRID ALIGNED WITH AXIS SCALE
+            const numStepsX = Math.round(maxX / stepX);
+            const totalSubX = numStepsX * 5;
+            for (let i = 0; i <= totalSubX; i++) {
+                const xVal = (i / 5) * stepX;
+                const px = toPxX(xVal);
+                if (px <= w - padR + 1) {
+                    const isMajor = (i % 5 === 0);
+                    ctx.strokeStyle = isMajor ? '#cbd5e1' : '#f1f5f9';
+                    ctx.lineWidth = isMajor ? 1.25 : 0.75;
+                    ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, h - padB); ctx.stroke();
+                }
+            }
+
+            const numStepsY = Math.round(maxY / stepY);
+            const totalSubY = numStepsY * 5;
+            for (let j = 0; j <= totalSubY; j++) {
+                const yVal = (j / 5) * stepY;
+                const py = toPxY(yVal);
+                if (py >= padT - 1) {
+                    const isMajor = (j % 5 === 0);
+                    ctx.strokeStyle = isMajor ? '#cbd5e1' : '#f1f5f9';
+                    ctx.lineWidth = isMajor ? 1.25 : 0.75;
+                    ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(w - padR, py); ctx.stroke();
+                }
+            }
+
+            // Axes Lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB); ctx.lineTo(w - padR, h - padB);
+            ctx.stroke();
+
+            // Axis Ticks & Numbers
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 11px Nunito';
+            ctx.textAlign = 'center';
+
+            for (let xV = 0; xV <= maxX; xV += stepX) {
+                const px = toPxX(xV);
+                const valStr = Number.isInteger(xV) ? xV : xV.toFixed(1);
+                ctx.beginPath(); ctx.moveTo(px, h - padB); ctx.lineTo(px, h - padB + 6); ctx.stroke();
+                ctx.fillText(valStr, px, h - padB + 18);
+            }
+
+            ctx.textAlign = 'right';
+            for (let yV = 0; yV <= maxY; yV += stepY) {
+                const py = toPxY(yV);
+                const valStr = Number.isInteger(yV) ? yV : yV.toFixed(1);
+                ctx.beginPath(); ctx.moveTo(padL - 6, py); ctx.lineTo(padL, py); ctx.stroke();
+                ctx.fillText(valStr, padL - 9, py + 4);
+            }
+
+            // Axis Titles
+            ctx.fillStyle = '#1cb0f6';
+            ctx.font = 'extrabold 12px Nunito';
+
+            ctx.textAlign = 'right';
+            ctx.fillText((q.xLabel || 'Tijd t (min)') + ' →', w - padR, h - 8);
+
+            ctx.textAlign = 'left';
+            ctx.save();
+            ctx.translate(16, h / 2 + 40);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText((q.yLabel || 'Waarde Y') + ' →', 0, 0);
+            ctx.restore();
+
+            // Points
+            q.data.forEach((pt, idx) => {
+                const px = toPxX(pt.x), py = toPxY(pt.y);
+
+                ctx.strokeStyle = (state.clickedOutlierIdx === idx) ? '#ff4b4b' : '#1cb0f6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.stroke();
+
+                if (q.outlierIdx === idx && q.type !== 'click-outlier') {
+                    ctx.strokeStyle = '#ff4b4b';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 11, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+
+            // Trendline
+            const validPts = q.data.filter((_, idx) => idx !== q.outlierIdx);
+            const pts = validPts.map(p => ({ px: toPxX(p.x), py: toPxY(p.y) }));
+
+            ctx.strokeStyle = '#58cc02';
+            ctx.lineWidth = 3;
+            if (q.lineType === 'straight') {
+                ctx.beginPath();
+                ctx.moveTo(pts[0].px, pts[0].py);
+                ctx.lineTo(pts[pts.length - 1].px, pts[pts.length - 1].py);
+                ctx.stroke();
+            } else if (q.lineType === 'smooth') {
+                ctx.beginPath();
+                ctx.moveTo(pts[0].px, pts[0].py);
+                for (let i = 1; i < pts.length; i++) {
+                    const xc = (pts[i - 1].px + pts[i].px) / 2;
+                    const yc = (pts[i - 1].py + pts[i].py) / 2;
+                    ctx.quadraticCurveTo(pts[i - 1].px, pts[i - 1].py, xc, yc);
+                }
+                ctx.lineTo(pts[pts.length - 1].px, pts[pts.length - 1].py);
+                ctx.stroke();
+            } else if (q.lineType === 'plateau') {
+                ctx.beginPath();
+                ctx.moveTo(pts[0].px, pts[0].py);
+                for (let i = 1; i < pts.length; i++) {
+                    if (Math.abs(validPts[i].y - validPts[i - 1].y) < 0.001) {
+                        ctx.lineTo(pts[i].px, pts[i].py);
+                    } else {
+                        const xc = (pts[i - 1].px + pts[i].px) / 2;
+                        const yc = (pts[i - 1].py + pts[i].py) / 2;
+                        ctx.quadraticCurveTo(pts[i - 1].px, pts[i - 1].py, xc, yc);
+                        ctx.lineTo(pts[i].px, pts[i].py);
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
+        /* ==========================================================================
+           6. GRAFIEK BOUWER ENGINE
+           ========================================================================== */
+        function populateMakerLevelSelect() {
+            const select = document.getElementById('maker-level-select');
+            select.innerHTML = '';
+            MAKER_LEVELS.forEach((lvl, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = lvl.title;
+                select.appendChild(opt);
+            });
+        }
+
+        function loadMakerLevel(idx) {
+            state.makerLevelIdx = parseInt(idx);
+            state.makerStep = 1;
+            const lvl = MAKER_LEVELS[state.makerLevelIdx];
+
+            userMakerState = {
+                xChoice: null,
+                xMax: lvl.suggXMax,
+                xStep: lvl.suggXStep,
+                yMax: lvl.suggYMax,
+                yStep: lvl.suggYStep,
+                points: [],
+                outlierIdx: null,
+                lineType: null
+            };
+
+            document.getElementById('maker-dataset-title').innerText = lvl.title;
+            document.getElementById('maker-level-select').value = state.makerLevelIdx;
+
+            renderMakerTable();
+            selectMakerStep(1);
+        }
+
+        function generateRandomMakerLevel() {
+            playSound('click');
+            const randomLevel = {
+                title: "Willekeurige Meting " + (MAKER_LEVELS.length + 1),
+                xGrootheid: "Tijd", xSymbol: "t", xEenheid: "s",
+                yGrootheid: "Afstand", ySymbol: "s", yEenheid: "m",
+                data: [{x:0, y:0}, {x:2, y:10}, {x:4, y:20}, {x:6, y:60}, {x:8, y:40}],
+                outlierIdx: 3,
+                suggXMax: 10, suggXStep: 2,
+                suggYMax: 50, suggYStep: 10,
+                lineType: "straight"
+            };
+            MAKER_LEVELS.push(randomLevel);
+            populateMakerLevelSelect();
+            loadMakerLevel(MAKER_LEVELS.length - 1);
+        }
+
+        function selectMakerStep(step) {
+            if (step > state.makerStep) return;
+            playSound('click');
+
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`mstep-${i}`);
+                if (i === step) {
+                    btn.className = "flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-duoBlue bg-blue-50 text-duoBlue transition";
+                } else if (i <= state.makerStep) {
+                    btn.className = "flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-duoGreen bg-green-50 text-duoGreen transition cursor-pointer";
+                } else {
+                    btn.className = "flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed";
+                }
+            }
+
+            renderMakerStepInstruction(step);
+            renderMakerCanvas();
+        }
+
+        function renderMakerStepInstruction(step) {
+            const container = document.getElementById('maker-step-instruction');
+            const lvl = MAKER_LEVELS[state.makerLevelIdx];
+
+            if (step === 1) {
+                container.innerHTML = `
+                    <h4 class="font-extrabold text-sm text-gray-800">Stap 1: Welke grootheid komt op de X-as?</h4>
+                    <p class="text-xs text-gray-500 font-bold mb-3">Onthoud: tijd of de zelf ingestelde variabele komt altijd op de horizontale X-as.</p>
+                    <select id="mstep1-x-select" onchange="updateMakerPreviewLive()" class="w-full border-2 border-gray-200 rounded-xl p-2 font-bold text-xs mb-3">
+                        <option value="incorrect">${lvl.yGrootheid} ${lvl.ySymbol} (${lvl.yEenheid})</option>
+                        <option value="correct">${lvl.xGrootheid} ${lvl.xSymbol} (${lvl.xEenheid})</option>
+                    </select>
+                    <button onclick="checkMakerStep(1)" class="btn-duo btn-duo-green w-full text-xs">Controleer Assen</button>
+                `;
+            } else if (step === 2) {
+                container.innerHTML = `
+                    <h4 class="font-extrabold text-sm text-gray-800">Stap 2: Stel de Schaalverdeling in</h4>
+                    <p class="text-xs text-gray-500 font-bold mb-3">Kies mooie ronde maxima en gelijke stappen. De grafiek past zich direct aan.</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-bold mb-3">
+                        <div>
+                            <label class="block text-gray-500">Max X-as</label>
+                            <input id="mstep2-xmax" type="number" value="${userMakerState.xMax}" oninput="updateMakerScaleLive()" class="w-full border-2 border-gray-200 rounded-lg p-1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-500">Stap X-as</label>
+                            <input id="mstep2-xstep" type="number" value="${userMakerState.xStep}" oninput="updateMakerScaleLive()" class="w-full border-2 border-gray-200 rounded-lg p-1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-500">Max Y-as</label>
+                            <input id="mstep2-ymax" type="number" value="${userMakerState.yMax}" oninput="updateMakerScaleLive()" class="w-full border-2 border-gray-200 rounded-lg p-1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-500">Stap Y-as</label>
+                            <input id="mstep2-ystep" type="number" value="${userMakerState.yStep}" oninput="updateMakerScaleLive()" class="w-full border-2 border-gray-200 rounded-lg p-1">
+                        </div>
+                    </div>
+                    <button onclick="checkMakerStep(2)" class="btn-duo btn-duo-green w-full text-xs">Bevestig Schaal</button>
+                `;
+            } else if (step === 3) {
+                container.innerHTML = `
+                    <h4 class="font-extrabold text-sm text-gray-800">Stap 3: Plot de Meetpunten</h4>
+                    <p class="text-xs text-gray-500 font-bold mb-3">Klik op het papier op de juiste locaties voor alle meetpunten uit de tabel.</p>
+                    <p class="text-xs font-black text-duoBlue mb-3">Geplaatste punten: ${userMakerState.points.length} / ${lvl.data.length}</p>
+                    <button onclick="checkMakerStep(3)" class="btn-duo btn-duo-green w-full text-xs">Controleer Punten</button>
+                `;
+            } else if (step === 4) {
+                container.innerHTML = `
+                    <h4 class="font-extrabold text-sm text-gray-800">Stap 4: Duid de Meetfout aan</h4>
+                    <p class="text-xs text-gray-500 font-bold mb-3">Welke meting in de tabel wijkt licht af van de verwachting?</p>
+                    <select id="mstep4-outlier-select" onchange="updateMakerOutlierLive()" class="w-full border-2 border-gray-200 rounded-xl p-2 font-bold text-xs mb-3">
+                        ${lvl.data.map((p, i) => `<option value="${i}">Punt ${i+1}: (${p.x}, ${p.y})</option>`).join('')}
+                    </select>
+                    <button onclick="checkMakerStep(4)" class="btn-duo btn-duo-green w-full text-xs">Omcirkel Meetfout</button>
+                `;
+            } else if (step === 5) {
+                container.innerHTML = `
+                    <h4 class="font-extrabold text-sm text-gray-800">Stap 5: Kies de Trendlijn</h4>
+                    <p class="text-xs text-gray-500 font-bold mb-3">Kies de lijn die het fysische verloop het beste beschrijft.</p>
+                    <select id="mstep5-line-select" onchange="updateMakerLineLive()" class="w-full border-2 border-gray-200 rounded-xl p-2 font-bold text-xs mb-3">
+                        <option value="straight">Rechte Lijn (Recht Evenredig)</option>
+                        <option value="smooth">Vloeiende Kromme (Geleidelijke verandering)</option>
+                    </select>
+                    <button onclick="checkMakerStep(5)" class="btn-duo btn-duo-green w-full text-xs">Grafiek Voltooien!</button>
+                `;
+            }
+        }
+
+        function updateMakerScaleLive() {
+            const xM = parseFloat(document.getElementById('mstep2-xmax')?.value);
+            const xS = parseFloat(document.getElementById('mstep2-xstep')?.value);
+            const yM = parseFloat(document.getElementById('mstep2-ymax')?.value);
+            const yS = parseFloat(document.getElementById('mstep2-ystep')?.value);
+
+            if (xM > 0) userMakerState.xMax = xM;
+            if (xS > 0) userMakerState.xStep = xS;
+            if (yM > 0) userMakerState.yMax = yM;
+            if (yS > 0) userMakerState.yStep = yS;
+
+            renderMakerCanvas();
+        }
+
+        function updateMakerPreviewLive() {
+            renderMakerCanvas();
+        }
+
+        function updateMakerOutlierLive() {
+            const select = document.getElementById('mstep4-outlier-select');
+            if (select) {
+                userMakerState.outlierIdx = parseInt(select.value);
+                renderMakerCanvas();
+            }
+        }
+
+        function updateMakerLineLive() {
+            const select = document.getElementById('mstep5-line-select');
+            if (select) {
+                userMakerState.lineType = select.value;
+                renderMakerCanvas();
+            }
+        }
+
+        function renderMakerTable() {
+            const lvl = MAKER_LEVELS[state.makerLevelIdx];
+            const thX = document.getElementById('th-maker-x');
+            const thY = document.getElementById('th-maker-y');
+            if (thX) thX.innerText = `${lvl.xGrootheid} (${lvl.xEenheid})`;
+            if (thY) thY.innerText = `${lvl.yGrootheid} (${lvl.yEenheid})`;
+
+            const tbody = document.getElementById('maker-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            lvl.data.forEach((p, idx) => {
+                const isPlotted = userMakerState.points.some(pt => Math.abs(pt.x - p.x) < 0.1 && Math.abs(pt.y - p.y) < 0.1);
+                const tr = document.createElement('tr');
+                if (userMakerState.outlierIdx === idx) {
+                    tr.className = 'bg-red-50 text-red-600 font-extrabold';
+                }
+                tr.innerHTML = `
+                    <td class="p-2">${p.x}</td>
+                    <td class="p-2">${p.y}</td>
+                    <td class="p-2 text-center">
+                        ${isPlotted ? '<span class="text-duoGreen font-black"><i class="fa-solid fa-check"></i></span>' : '<span class="text-gray-300">•</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function handleMakerCanvasClick(e) {
+            if (state.makerStep !== 3) return;
+
+            const canvas = document.getElementById('maker-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            const padL = 60, padB = 45, padR = 25, padT = 25;
+            const gW = canvas.width - padL - padR, gH = canvas.height - padT - padB;
+            const xMax = userMakerState.xMax || 10;
+            const yMax = userMakerState.yMax || 100;
+
+            const valX = parseFloat((((clickX - padL) / gW) * xMax).toFixed(1));
+            const valY = parseFloat((((canvas.height - padB - clickY) / gH) * yMax).toFixed(1));
+
+            if (valX >= 0 && valX <= xMax && valY >= 0 && valY <= yMax) {
+                playSound('click');
+                const existingIdx = userMakerState.points.findIndex(p => Math.abs(p.x - valX) < (xMax * 0.05) && Math.abs(p.y - valY) < (yMax * 0.05));
+                if (existingIdx !== -1) {
+                    userMakerState.points.splice(existingIdx, 1);
+                } else {
+                    userMakerState.points.push({ x: valX, y: valY });
+                }
+                renderMakerTable();
+                renderMakerStepInstruction(3);
+                renderMakerCanvas();
+            }
+        }
+
+        function checkMakerStep(step) {
+            const lvl = MAKER_LEVELS[state.makerLevelIdx];
+
+            if (step === 1) {
+                const sel = document.getElementById('mstep1-x-select');
+                if (sel && sel.value === 'correct') {
+                    playSound('correct');
+                    state.xp += 10;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    state.makerStep = Math.max(state.makerStep, 2);
+                    showFeedbackBanner(true, "Goed zo!", "De tijd / onafhankelijke variabele hoort op de X-as.");
+                    state.bannerAction = () => selectMakerStep(2);
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Niet juist", "Kijk goed welk symbool de tijd of onafhankelijke variabele is.");
+                }
+            } else if (step === 2) {
+                if (userMakerState.xMax >= Math.max(...lvl.data.map(d=>d.x)) && userMakerState.yMax >= Math.max(...lvl.data.map(d=>d.y))) {
+                    playSound('correct');
+                    state.xp += 10;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    state.makerStep = Math.max(state.makerStep, 3);
+                    showFeedbackBanner(true, "Schaal goedgekeurd!", "De schaalverdeling is groot genoeg voor alle gegevens.");
+                    state.bannerAction = () => selectMakerStep(3);
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Schaal te klein", "Zorg dat de maximale aswaarden hoger zijn dan het hoogste meetpunt!");
+                }
+            } else if (step === 3) {
+                if (userMakerState.points.length >= lvl.data.length - 1) {
+                    playSound('correct');
+                    state.xp += 15;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    state.makerStep = Math.max(state.makerStep, 4);
+                    showFeedbackBanner(true, "Punten geplaatst!", "Alle meetpunten zijn getekend op het papier.");
+                    state.bannerAction = () => selectMakerStep(4);
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Plaats alle punten", `Plaats ten minste ${lvl.data.length} punten op het canvas.`);
+                }
+            } else if (step === 4) {
+                const sel = document.getElementById('mstep4-outlier-select');
+                const chosenIdx = sel ? parseInt(sel.value) : -1;
+                if (chosenIdx === lvl.outlierIdx) {
+                    playSound('correct');
+                    state.xp += 15;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    state.makerStep = Math.max(state.makerStep, 5);
+                    userMakerState.outlierIdx = chosenIdx;
+                    renderMakerTable();
+                    showFeedbackBanner(true, "Meetfout herkend!", "Je hebt de uitbijter omcirkeld. Deze wordt overgeslagen bij het trekken van de trendlijn.");
+                    state.bannerAction = () => selectMakerStep(5);
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Probeer opnieuw", "Vergelijk de punten; een van de punten wijkt af van het regelmatig verloop.");
+                }
+            } else if (step === 5) {
+                const sel = document.getElementById('mstep5-line-select');
+                const chosenType = sel ? sel.value : 'straight';
+                if (chosenType === lvl.lineType) {
+                    playSound('correct');
+                    state.xp += 25;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    userMakerState.lineType = chosenType;
+                    renderMakerCanvas();
+                    showFeedbackBanner(true, "Grafiek Compleet!", "Gefeliciteerd! Je hebt een nette en nauwkeurige NaSk-grafiek gemaakt.");
+                    state.bannerAction = null;
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Kijk goed naar de punten", `Voor dit experiment past een ${lvl.lineType === 'smooth' ? 'vloeiende kromme' : 'rechte lijn'} beter.`);
+                }
+            }
+        }
+
+        function renderMakerCanvas() {
+            const canvas = document.getElementById('maker-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const lvl = MAKER_LEVELS[state.makerLevelIdx];
+
+            const padL = 60, padB = 45, padR = 25, padT = 25;
+            const gW = w - padL - padR, gH = h - padT - padB;
+
+            const xMax = userMakerState.xMax || lvl.suggXMax;
+            const xStep = userMakerState.xStep || lvl.suggXStep;
+            const yMax = userMakerState.yMax || lvl.suggYMax;
+            const yStep = userMakerState.yStep || lvl.suggYStep;
+
+            const toPxX = v => padL + (v / xMax) * gW;
+            const toPxY = v => (h - padB) - (v / yMax) * gH;
+
+            // Grid Background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            const numStepsX = Math.round(xMax / xStep);
+            const totalSubX = numStepsX * 5;
+            for (let i = 0; i <= totalSubX; i++) {
+                const xVal = (i / 5) * xStep;
+                const px = toPxX(xVal);
+                if (px <= w - padR + 1) {
+                    const isMajor = (i % 5 === 0);
+                    ctx.strokeStyle = isMajor ? '#cbd5e1' : '#f1f5f9';
+                    ctx.lineWidth = isMajor ? 1.25 : 0.75;
+                    ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, h - padB); ctx.stroke();
+                }
+            }
+
+            const numStepsY = Math.round(yMax / yStep);
+            const totalSubY = numStepsY * 5;
+            for (let j = 0; j <= totalSubY; j++) {
+                const yVal = (j / 5) * yStep;
+                const py = toPxY(yVal);
+                if (py >= padT - 1) {
+                    const isMajor = (j % 5 === 0);
+                    ctx.strokeStyle = isMajor ? '#cbd5e1' : '#f1f5f9';
+                    ctx.lineWidth = isMajor ? 1.25 : 0.75;
+                    ctx.beginPath(); ctx.moveTo(padL, py); ctx.lineTo(w - padR, py); ctx.stroke();
+                }
+            }
+
+            // Axes
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB); ctx.lineTo(w - padR, h - padB);
+            ctx.stroke();
+
+            // Ticks & Axis numbers
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 11px Nunito';
+            ctx.textAlign = 'center';
+
+            for (let xV = 0; xV <= xMax; xV += xStep) {
+                const px = toPxX(xV);
+                ctx.beginPath(); ctx.moveTo(px, h - padB); ctx.lineTo(px, h - padB + 6); ctx.stroke();
+                ctx.fillText(xV, px, h - padB + 18);
+            }
+
+            ctx.textAlign = 'right';
+            for (let yV = 0; yV <= yMax; yV += yStep) {
+                const py = toPxY(yV);
+                ctx.beginPath(); ctx.moveTo(padL - 6, py); ctx.lineTo(padL, py); ctx.stroke();
+                ctx.fillText(yV, padL - 9, py + 4);
+            }
+
+            // Labels
+            ctx.fillStyle = '#1cb0f6';
+            ctx.font = 'extrabold 12px Nunito';
+
+            const selX = document.getElementById('mstep1-x-select');
+            const xLabelText = (selX && selX.value === 'correct') 
+                ? `${lvl.xGrootheid} ${lvl.xSymbol} (${lvl.xEenheid})`
+                : (selX && selX.value === 'incorrect') ? `${lvl.yGrootheid} ${lvl.ySymbol} (${lvl.yEenheid})` : `${lvl.xGrootheid} ${lvl.xSymbol} (${lvl.xEenheid})`;
+
+            const yLabelText = `${lvl.yGrootheid} ${lvl.ySymbol} (${lvl.yEenheid})`;
+
+            ctx.textAlign = 'right';
+            ctx.fillText(xLabelText + ' →', w - padR, h - 8);
+
+            ctx.textAlign = 'left';
+            ctx.save();
+            ctx.translate(16, h / 2 + 40);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(yLabelText + ' →', 0, 0);
+            ctx.restore();
+
+            // User Plotted Points
+            userMakerState.points.forEach((pt) => {
+                const px = toPxX(pt.x), py = toPxY(pt.y);
+                ctx.strokeStyle = '#1cb0f6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            // Outlier circle
+            if (state.makerStep >= 4 && userMakerState.outlierIdx !== null && lvl.data[userMakerState.outlierIdx]) {
+                const oPt = lvl.data[userMakerState.outlierIdx];
+                const px = toPxX(oPt.x), py = toPxY(oPt.y);
+                ctx.strokeStyle = '#ff4b4b';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(px, py, 11, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Trendline
+            if (state.makerStep >= 5 && userMakerState.lineType) {
+                const validPts = lvl.data.filter((_, idx) => idx !== userMakerState.outlierIdx);
+                const pts = validPts.map(p => ({ px: toPxX(p.x), py: toPxY(p.y) }));
+
+                ctx.strokeStyle = '#58cc02';
+                ctx.lineWidth = 3;
+                if (userMakerState.lineType === 'straight') {
+                    ctx.beginPath();
+                    ctx.moveTo(pts[0].px, pts[0].py);
+                    ctx.lineTo(pts[pts.length - 1].px, pts[pts.length - 1].py);
+                    ctx.stroke();
+                } else if (userMakerState.lineType === 'smooth') {
+                    ctx.beginPath();
+                    ctx.moveTo(pts[0].px, pts[0].py);
+                    for (let i = 1; i < pts.length; i++) {
+                        const xc = (pts[i - 1].px + pts[i].px) / 2;
+                        const yc = (pts[i - 1].py + pts[i].py) / 2;
+                        ctx.quadraticCurveTo(pts[i - 1].px, pts[i - 1].py, xc, yc);
+                    }
+                    ctx.lineTo(pts[pts.length - 1].px, pts[pts.length - 1].py);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function handleMakerCanvasMouseMove(e) {
+            const canvas = document.getElementById('maker-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            const padL = 60, padB = 45, padR = 25, padT = 25;
+            const gW = canvas.width - padL - padR, gH = canvas.height - padT - padB;
+            const xMax = userMakerState.xMax || 10;
+            const yMax = userMakerState.yMax || 100;
+
+            const valX = (((mouseX - padL) / gW) * xMax).toFixed(1);
+            const valY = (((canvas.height - padB - mouseY) / gH) * yMax).toFixed(1);
+
+            const hoverElem = document.getElementById('maker-coords-hover');
+            if (mouseX >= padL && mouseX <= canvas.width - padR && mouseY >= padT && mouseY <= canvas.height - padB) {
+                hoverElem.innerText = `X: ${valX} | Y: ${valY}`;
+            } else {
+                hoverElem.innerText = `X: - | Y: -`;
+            }
+        }
+
+        /* ==========================================================================
+           7. VERHOUDINGSTABEL ENGINE
+           ========================================================================== */
+        function generateRatioQuestion() {
+            hideFeedbackBanner();
+            const type = document.getElementById('ratio-type-select').value;
+
+            const scenarios = [
+                { item: "fietser", xName: "Tijd t (min)", yName: "Afstand s (km)", x1: 15, y1: 4.5, x2: 45 },
+                { item: "scooter", xName: "Tijd t (s)", yName: "Afstand s (m)", x1: 5, y1: 50, x2: 20 },
+                { item: "blokje hout", xName: "Volume V (cm³)", yName: "Massa m (g)", x1: 10, y1: 8, x2: 30 },
+                { item: "zonnebloemolie", xName: "Volume V (cm³)", yName: "Massa m (g)", x1: 20, y1: 18, x2: 50 }
+            ];
+
+            const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const unitVal = sc.y1 / sc.x1;
+            const answer = unitVal * sc.x2;
+            
+            state.ratioAnswer = {
+                type: type,
+                x1: sc.x1,
+                y1: sc.y1,
+                x2: sc.x2,
+                unitVal: parseFloat(unitVal.toFixed(2)),
+                finalAns: parseFloat(answer.toFixed(1))
+            };
+
+            document.getElementById('ratio-problem-text').innerText =
+                `Een ${sc.item} heeft bij de eerste meting ${sc.xName} = ${sc.x1} en ${sc.yName} = ${sc.y1}. Bereken met de verhoudingstabel de ${sc.yName} bij ${sc.xName} = ${sc.x2}.`;
+
+            const container = document.getElementById('ratio-table-render');
+
+            if (type === '6') {
+                container.innerHTML = `
+                    <table class="border-2 border-purple-300 bg-white rounded-xl overflow-hidden font-extrabold text-sm">
+                        <tr class="bg-purple-100 border-b border-purple-200">
+                            <td class="p-3 border-r border-purple-200">${sc.xName}</td>
+                            <td class="p-3 border-r border-purple-200 text-center">${sc.x1}</td>
+                            <td class="p-3 text-center">${sc.x2}</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-r border-purple-200">${sc.yName}</td>
+                            <td class="p-3 border-r border-purple-200 text-center">${sc.y1}</td>
+                            <td class="p-3 text-center">
+                                <input id="ratio-user-input-final" type="number" step="0.1" class="ratio-input" placeholder="?">
+                            </td>
+                        </tr>
+                    </table>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="space-y-2 text-center">
+                        <p class="text-xs font-bold text-purple-700">Vul alle 3 de ontbrekende vakjes in (tussenstap via 1):</p>
+                        <table class="border-2 border-purple-300 bg-white rounded-xl overflow-hidden font-extrabold text-sm">
+                            <tr class="bg-purple-100 border-b border-purple-200">
+                                <td class="p-3 border-r border-purple-200">${sc.xName}</td>
+                                <td class="p-3 border-r border-purple-200 text-center">${sc.x1}</td>
+                                <td class="p-3 border-r border-purple-200 text-center bg-purple-50">
+                                    <input id="ratio-user-input-step1" type="number" class="ratio-input" placeholder="1?">
+                                </td>
+                                <td class="p-3 text-center">${sc.x2}</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border-r border-purple-200">${sc.yName}</td>
+                                <td class="p-3 border-r border-purple-200 text-center">${sc.y1}</td>
+                                <td class="p-3 border-r border-purple-200 text-center bg-purple-50">
+                                    <input id="ratio-user-input-unit" type="number" step="0.01" class="ratio-input" placeholder="per 1?">
+                                </td>
+                                <td class="p-3 text-center">
+                                    <input id="ratio-user-input-final" type="number" step="0.1" class="ratio-input" placeholder="Eind?">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+            }
+        }
+
+        function checkRatioAnswer() {
+            const finalInput = document.getElementById('ratio-user-input-final');
+            if (!finalInput || !finalInput.value) return;
+
+            const type = state.ratioAnswer.type;
+            const userFinal = parseFloat(finalInput.value);
+
+            if (type === '6') {
+                if (Math.abs(userFinal - state.ratioAnswer.finalAns) < 0.2) {
+                    playSound('correct');
+                    state.xp += 20;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    showFeedbackBanner(true, "Helemaal goed!", `Het antwoord is inderdaad ${state.ratioAnswer.finalAns}.`);
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Foutje...", `Het juiste antwoord is ${state.ratioAnswer.finalAns}. Controleer de berekening.`);
+                }
+            } else {
+                const step1Input = document.getElementById('ratio-user-input-step1');
+                const unitInput = document.getElementById('ratio-user-input-unit');
+
+                const userStep1 = parseFloat(step1Input?.value);
+                const userUnit = parseFloat(unitInput?.value);
+
+                const isStep1Ok = (userStep1 === 1);
+                const isUnitOk = Math.abs(userUnit - state.ratioAnswer.unitVal) < 0.1;
+                const isFinalOk = Math.abs(userFinal - state.ratioAnswer.finalAns) < 0.2;
+
+                if (isStep1Ok && isUnitOk && isFinalOk) {
+                    playSound('correct');
+                    state.xp += 25;
+                    const xpElem = document.getElementById('stat-xp');
+                    if (xpElem) xpElem.innerText = state.xp;
+                    showFeedbackBanner(true, "Uitstekend gedaan!", "Alle 3 de vakjes van de verhoudingstabel zijn correct ingevuld!");
+                } else if (!isStep1Ok) {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Tussenstap Fout", "De tussenstap hoort altijd via het getal '1' te gaan!");
+                } else if (!isUnitOk) {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Sleutelwaarde Fout", `De waarde per 1 is ${state.ratioAnswer.y1} / ${state.ratioAnswer.x1} = ${state.ratioAnswer.unitVal}.`);
+                } else {
+                    playSound('wrong');
+                    showFeedbackBanner(false, "Eindantwoord Fout", `Vermenigvuldig ${state.ratioAnswer.unitVal} met ${state.ratioAnswer.x2} om ${state.ratioAnswer.finalAns} te krijgen.`);
+                }
+            }
+        }
+
+        /* ==========================================================================
+           8. FEEDBACK BANNER CONTROLLER
+           ========================================================================== */
+        function showFeedbackBanner(isCorrect, title, message) {
+            if (autoProceedTimeout) {
+                clearTimeout(autoProceedTimeout);
+                autoProceedTimeout = null;
+            }
+
+            const banner = document.getElementById('feedback-banner');
+            const iconBox = document.getElementById('fb-icon-box');
+            const icon = document.getElementById('fb-icon');
+            const timerBar = document.getElementById('fb-timer-bar');
+            const autoCount = document.getElementById('fb-auto-count');
+
+            const titleElem = document.getElementById('fb-title');
+            const msgElem = document.getElementById('fb-message');
+
+            if (titleElem) titleElem.innerText = title;
+            if (msgElem) msgElem.innerText = message;
+
+            if (isCorrect) {
+                if (banner) banner.className = "feedback-banner bg-emerald-50 border-emerald-500 border-t-4 text-emerald-950 show overflow-hidden";
+                if (iconBox) iconBox.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-2xl flex-shrink-0 bg-duoGreen";
+                if (icon) icon.className = "fa-solid fa-check";
+                
+                if (timerBar) {
+                    timerBar.classList.remove('hidden');
+                    timerBar.style.width = '100%';
+                    setTimeout(() => { if (timerBar) timerBar.style.width = '0%'; }, 50);
+                }
+
+                if (autoCount) autoCount.innerText = "(3s)";
+                autoProceedTimeout = setTimeout(() => {
+                    handleBannerProceed();
+                }, 3000);
+            } else {
+                if (banner) banner.className = "feedback-banner bg-rose-50 border-rose-500 border-t-4 text-rose-950 show overflow-hidden";
+                if (iconBox) iconBox.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-2xl flex-shrink-0 bg-duoRed";
+                if (icon) icon.className = "fa-solid fa-xmark";
+                
+                if (timerBar) timerBar.classList.add('hidden');
+                if (autoCount) autoCount.innerText = "";
+            }
+        }
+
+        function hideFeedbackBanner() {
+            if (autoProceedTimeout) {
+                clearTimeout(autoProceedTimeout);
+                autoProceedTimeout = null;
+            }
+            const banner = document.getElementById('feedback-banner');
+            if (banner) banner.classList.remove('show');
+        }
+
+        function handleBannerProceed() {
+            hideFeedbackBanner();
+            if (state.bannerAction) {
+                const action = state.bannerAction;
+                state.bannerAction = null;
+                action();
+            }
+        }
+
+        /* ==========================================================================
+           9. INITIALIZATION ON PAGE LOAD
+           ========================================================================== */
+        window.onload = function() {
+            shuffleQuizQuestions();
+            populateMakerLevelSelect();
+            loadMakerLevel(0);
+
+            const quizCanvas = document.getElementById('quiz-canvas');
+            if (quizCanvas) {
+                quizCanvas.addEventListener('click', handleQuizCanvasClick);
+            }
+
+            const makerCanvas = document.getElementById('maker-canvas');
+            if (makerCanvas) {
+                makerCanvas.addEventListener('click', handleMakerCanvasClick);
+                makerCanvas.addEventListener('mousemove', handleMakerCanvasMouseMove);
+            }
+
+            renderQuizQuestion();
+        };
+    </script>
+</body>
+</html>
