@@ -200,6 +200,7 @@
                 </div>
                 <div>
                     <h1 class="font-black text-lg leading-tight text-gray-800">NaSk Grafieken Oefenen</h1>
+                    <p class="text-xs font-bold text-gray-400">Grafieken & Verhoudingstabellen</p>
                 </div>
             </div>
 
@@ -272,7 +273,7 @@
 
                 <!-- Optional Subtext / Context -->
                 <p id="quiz-context-text" class="text-sm font-semibold text-gray-500">
-                    Bekijk de onderstaande NaSk-grafiek van het afkoelen van een vloeistof.
+                    Bekijk de onderstaande grafiek van het afkoelen van een vloeistof.
                 </p>
 
                 <!-- Interactive Graph Area / Visual -->
@@ -305,7 +306,7 @@
             <!-- Header & Level Picker -->
             <div class="bg-white p-4 rounded-2xl border-2 border-gray-200 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 class="font-black text-lg text-gray-800">Constructie van een NaSk-grafiek</h2>
+                    <h2 class="font-black text-lg text-gray-800">Constructie van een grafiek</h2>
                     <p class="text-xs font-bold text-gray-400">Doorloop de 5 stappen om een correcte natuurkundige grafiek op te stellen.</p>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -323,7 +324,7 @@
                 <button id="mstep-1" onclick="selectMakerStep(1)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-duoBlue bg-blue-50 text-duoBlue transition">1. Assen</button>
                 <button id="mstep-2" onclick="selectMakerStep(2)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">2. Schaal</button>
                 <button id="mstep-3" onclick="selectMakerStep(3)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">3. Punten</button>
-                <button id="mstep-4" onclick="selectMakerStep(4)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">4. Meetfout</button>
+                <button id="mstep-4" onclick="selectMakerStep(4)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">4. meetfout</button>
                 <button id="mstep-5" onclick="selectMakerStep(5)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">5. Trendlijn</button>
             </div>
 
@@ -386,7 +387,7 @@
             <div class="bg-white p-6 rounded-3xl border-2 border-gray-200 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <span class="text-xs font-black uppercase tracking-wider text-duoPurple bg-purple-100 px-3 py-1 rounded-full">Rekenen in NaSk</span>
+                        <span class="text-xs font-black uppercase tracking-wider text-duoPurple bg-purple-100 px-3 py-1 rounded-full">Rekenen</span>
                         <h2 class="text-xl font-black text-gray-800 mt-2">Verhoudingstabellen Oefensessie</h2>
                     </div>
                     <div class="flex items-center space-x-2">
@@ -752,7 +753,7 @@
                 data: [{x:0, y:20}, {x:1, y:18}, {x:2, y:16}, {x:3, y:18}, {x:4, y:12}, {x:5, y:10}],
                 outlierIdx: 3, // expected 14cm, measured 18cm
                 lineType: "straight",
-                explanation: "Bij t = 3 uur geeft de meting 18 cm aan (terwijl de kaars geleidelijk korter wordt naar 14 cm). Dit is een afwijker."
+                explanation: "Bij t = 3 uur geeft de meting 18 cm aan (terwijl de kaars geleidelijk korter wordt naar 14 cm). Dit is een meetfout."
             },
             {
                 id: 11,
@@ -772,7 +773,7 @@
             {
                 id: 12,
                 topic: "Grafiekregels",
-                question: "Waarom gebruiken we geen hoekige 'zaagtandlijn' (punt-naar-punt) in een NaSk-grafiek?",
+                question: "Waarom gebruiken we geen hoekige 'zaagtandlijn' (punt-naar-punt) in een grafiek?",
                 type: "mc",
                 xLabel: "Tijd t (s)",
                 yLabel: "Temperatuur T (°C)",
@@ -996,7 +997,7 @@
             {
                 id: 27,
                 topic: "Smelten & Faseovergang",
-                question: "Klik direct op de meetfout in deze smeltkromme.",
+                question: "Klik direct op de meetfout (meetfout) in deze smeltkromme.",
                 context: "Het opwarmen en smelten van ijsblokjes.",
                 type: "click-outlier",
                 xLabel: "Tijd t (min)",
@@ -1738,7 +1739,7 @@
                     if (xpElem) xpElem.innerText = state.xp;
                     userMakerState.lineType = chosenType;
                     renderMakerCanvas();
-                    showFeedbackBanner(true, "Grafiek Compleet!", "Gefeliciteerd! Je hebt een nette en nauwkeurige NaSk-grafiek gemaakt.");
+                    showFeedbackBanner(true, "Grafiek Compleet!", "Gefeliciteerd! Je hebt een nette en nauwkeurige grafiek gemaakt.");
                     state.bannerAction = null;
                 } else {
                     playSound('wrong');
@@ -1921,10 +1922,16 @@
             const type = document.getElementById('ratio-type-select').value;
 
             const scenarios = [
-                { item: "fietser", xName: "Tijd t (min)", yName: "Afstand s (km)", x1: 15, y1: 4.5, x2: 45 },
-                { item: "scooter", xName: "Tijd t (s)", yName: "Afstand s (m)", x1: 5, y1: 50, x2: 20 },
-                { item: "blokje hout", xName: "Volume V (cm³)", yName: "Massa m (g)", x1: 10, y1: 8, x2: 30 },
-                { item: "zonnebloemolie", xName: "Volume V (cm³)", yName: "Massa m (g)", x1: 20, y1: 18, x2: 50 }
+                { template: "default", item: "fietser", xName: "Tijd t (min)", yName: "Afstand s (km)", x1: 15, y1: 4.5, x2: 45 },
+                { template: "default", item: "scooter", xName: "Tijd t (s)", yName: "Afstand s (m)", x1: 5, y1: 50, x2: 20 },
+                { template: "default", item: "blokje koper", xName: "Volume V (cm³)", yName: "Massa m (g)", x1: 10, y1: 89, x2: 30 },
+                { template: "default", item: "hoeveelheid zonnebloemolie", xName: "Volume V (cm³)", yName: "Massa m (g)", x1: 20, y1: 18, x2: 50 },
+                { template: "custom", text: "Voor het schoolfeest zijn 240 kaartjes verkocht (100%). Van alle kaartjes is 35% verkocht aan brugklassers. De overige kaartjes (65%) zijn voor hogere leerjaren. Bereken met de verhoudingstabel hoeveel kaartjes er zijn verkocht aan leerlingen uit hogere leerjaren.", xName: "Percentage (%)", yName: "Kaartjes", x1: 100, y1: 240, x2: 65 },
+                { template: "custom", text: "Tijdens het schoolfeest worden 60 bekers limonade verkocht voor in totaal € 90. Bereken met de verhoudingstabel hoeveel 1 beker limonade kost.", xName: "Aantal bekers", yName: "Prijs (€)", x1: 60, y1: 90, x2: 1 },
+                { template: "custom", text: "Op een plattegrond komt 2 cm overeen met een werkelijke afstand van 500 meter. Bereken de werkelijke lengte in meters van een straat die 7 cm is op de kaart.", xName: "Afstand kaart (cm)", yName: "Werkelijk (m)", x1: 2, y1: 500, x2: 7 },
+                { template: "custom", text: "Een smartphone kost normaal € 400 (dat is 100%). Je krijgt 15% korting in de winkel, dus je betaalt nog 85%. Bereken met de verhoudingstabel de nieuwe prijs.", xName: "Percentage (%)", yName: "Prijs (€)", x1: 100, y1: 400, x2: 85 },
+                { template: "custom", text: "Een auto rijdt met een constante snelheid op de snelweg. Hij legt 135 km af in 90 minuten. Bereken met de verhoudingstabel hoeveel kilometer de auto aflegt in 15 minuten.", xName: "Tijd t (min)", yName: "Afstand s (km)", x1: 90, y1: 135, x2: 15 },
+                { template: "custom", text: "Bij een kookproef wordt water verwarmd. Er is 16,8 kJ warmte-energie nodig om het water 10 graden op te warmen. Bereken met de verhoudingstabel hoeveel energie (in kJ) er nodig is voor 25 graden temperatuurstijging.", xName: "Opwarming (°C)", yName: "Energie (kJ)", x1: 10, y1: 16.8, x2: 25 }
             ];
 
             const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
@@ -1937,11 +1944,15 @@
                 y1: sc.y1,
                 x2: sc.x2,
                 unitVal: parseFloat(unitVal.toFixed(2)),
-                finalAns: parseFloat(answer.toFixed(1))
+                finalAns: parseFloat(answer.toFixed(2))
             };
 
-            document.getElementById('ratio-problem-text').innerText =
-                `Een ${sc.item} heeft bij de eerste meting ${sc.xName} = ${sc.x1} en ${sc.yName} = ${sc.y1}. Bereken met de verhoudingstabel de ${sc.yName} bij ${sc.xName} = ${sc.x2}.`;
+            if (sc.template === "custom") {
+                document.getElementById('ratio-problem-text').innerText = sc.text;
+            } else {
+                document.getElementById('ratio-problem-text').innerText =
+                    `Een ${sc.item} heeft bij de eerste meting ${sc.xName} = ${sc.x1} en ${sc.yName} = ${sc.y1}. Bereken met de verhoudingstabel de ${sc.yName} bij ${sc.xName} = ${sc.x2}.`;
+            }
 
             const container = document.getElementById('ratio-table-render');
 
@@ -2005,6 +2016,7 @@
                     const xpElem = document.getElementById('stat-xp');
                     if (xpElem) xpElem.innerText = state.xp;
                     showFeedbackBanner(true, "Helemaal goed!", `Het antwoord is inderdaad ${state.ratioAnswer.finalAns}.`);
+                    state.bannerAction = () => generateRatioQuestion();
                 } else {
                     playSound('wrong');
                     showFeedbackBanner(false, "Foutje...", `Het juiste antwoord is ${state.ratioAnswer.finalAns}. Controleer de berekening.`);
@@ -2026,6 +2038,7 @@
                     const xpElem = document.getElementById('stat-xp');
                     if (xpElem) xpElem.innerText = state.xp;
                     showFeedbackBanner(true, "Uitstekend gedaan!", "Alle 3 de vakjes van de verhoudingstabel zijn correct ingevuld!");
+                    state.bannerAction = () => generateRatioQuestion();
                 } else if (!isStep1Ok) {
                     playSound('wrong');
                     showFeedbackBanner(false, "Tussenstap Fout", "De tussenstap hoort altijd via het getal '1' te gaan!");
