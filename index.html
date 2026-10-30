@@ -323,7 +323,7 @@
                 <button id="mstep-1" onclick="selectMakerStep(1)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-duoBlue bg-blue-50 text-duoBlue transition">1. Assen</button>
                 <button id="mstep-2" onclick="selectMakerStep(2)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">2. Schaal</button>
                 <button id="mstep-3" onclick="selectMakerStep(3)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">3. Punten</button>
-                <button id="mstep-4" onclick="selectMakerStep(4)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">4. Uitbijter</button>
+                <button id="mstep-4" onclick="selectMakerStep(4)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">4. Meetfout</button>
                 <button id="mstep-5" onclick="selectMakerStep(5)" class="flex-1 py-2 px-3 rounded-xl font-black text-xs text-center border-2 border-transparent text-gray-400 transition opacity-50 cursor-not-allowed">5. Trendlijn</button>
             </div>
 
@@ -752,7 +752,7 @@
                 data: [{x:0, y:20}, {x:1, y:18}, {x:2, y:16}, {x:3, y:18}, {x:4, y:12}, {x:5, y:10}],
                 outlierIdx: 3, // expected 14cm, measured 18cm
                 lineType: "straight",
-                explanation: "Bij t = 3 uur geeft de meting 18 cm aan (terwijl de kaars geleidelijk korter wordt naar 14 cm). Dit is een uitbijter."
+                explanation: "Bij t = 3 uur geeft de meting 18 cm aan (terwijl de kaars geleidelijk korter wordt naar 14 cm). Dit is een afwijker."
             },
             {
                 id: 11,
@@ -996,7 +996,7 @@
             {
                 id: 27,
                 topic: "Smelten & Faseovergang",
-                question: "Klik direct op de uitbijter (meetfout) in deze smeltkromme.",
+                question: "Klik direct op de meetfout in deze smeltkromme.",
                 context: "Het opwarmen en smelten van ijsblokjes.",
                 type: "click-outlier",
                 xLabel: "Tijd t (min)",
@@ -1722,7 +1722,7 @@
                     state.makerStep = Math.max(state.makerStep, 5);
                     userMakerState.outlierIdx = chosenIdx;
                     renderMakerTable();
-                    showFeedbackBanner(true, "Meetfout herkend!", "Je hebt de uitbijter omcirkeld. Deze wordt overgeslagen bij het trekken van de trendlijn.");
+                    showFeedbackBanner(true, "Meetfout herkend!", "Je hebt de meetfout omcirkeld. Deze wordt overgeslagen bij het trekken van de trendlijn.");
                     state.bannerAction = () => selectMakerStep(5);
                 } else {
                     playSound('wrong');
